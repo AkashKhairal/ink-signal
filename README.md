@@ -54,7 +54,11 @@ It ships with a `SKILL.md`, so Claude can cut your reels with it.
   </tr>
   <tr>
     <td align="center"><img src="docs/media/gif/tr-paper-roll.gif" alt="Transition: a graph-paper page unrolls over the frame with CHAPTER 02 and rolls away" width="100%"><br><b>3D paper roll transition</b> · <code>tr-paper-roll</code></td>
-    <td align="center"><img src="docs/media/gif/tr-torn.gif" alt="Transition: a torn ink panel wipes across the frame" width="100%"><br><b>Torn-paper wipe</b> · <code>tr-torn</code></td>
+    <td align="center"><img src="docs/media/gif/tr-torn.gif" alt="Transition: a torn paper panel covers the 3D title and reveals the next shot" width="100%"><br><b>Torn-paper wipe</b> · <code>tr-torn</code></td>
+  </tr>
+  <tr>
+    <td align="center"><img src="docs/media/gif/endcard-yt.gif" alt="End card: SEE YA rising, end-screen slots and a subscribe circle stamping in" width="100%"><br><b>End card</b> · <code>endcard</code></td>
+    <td align="center"><img src="docs/media/gif/tr-ticker.gif" alt="Transition: a ticker band grows to fill the frame and collapses" width="100%"><br><b>Ticker wipe</b> · <code>tr-ticker</code></td>
   </tr>
 </table>
 
