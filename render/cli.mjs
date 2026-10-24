@@ -37,6 +37,34 @@ const fsUrl = (abs) => '/@fs/' + path.resolve(abs).replace(/\\/g, '/').replace(/
 
 const VIDEO = /\.(mp4|mov|m4v|webm|mkv|avi|mts)$/i;
 
+/** motion scenes (DOM engine) by name */
+export async function motionScenes() { return (await import('../runtime/motion/scenes/index.js')).SCENES; }
+export async function isMotion(target) { if (!target || target.endsWith('.json') || target.endsWith('.html')) return false; return !!(await motionScenes())[target]; }
+
+/** extract the footage a motion scene asks for (def.media(p) → [{ key, src, start, frames, w, h }]) to JPEG sequences */
+export async function prepareMotionMedia(def, p, base, cacheRoot) {
+  if (!def.media) return p;
+  const { resolveParams, sceneFrames } = await import('../runtime/motion/scene.js');
+  const rp = resolveParams(def, p); const { fps } = sceneFrames(def, p);
+  const seq = {};
+  for (const m of def.media(rp) || []) {
+    if (!m || !m.src) continue;
+    const file = path.resolve(base, m.src);
+    if (!fs.existsSync(file)) throw new Error('Footage not found: ' + file);
+    if (!VIDEO.test(file)) { seq[m.key] = { image: fsUrl(file) }; continue; }
+    const key = Buffer.from(`${file}|${fs.statSync(file).mtimeMs}|${m.start || 0}|${m.frames}|${fps}|${m.w}x${m.h}`).toString('base64url').slice(-40);
+    const dir = path.join(cacheRoot, key);
+    if (!fs.existsSync(path.join(dir, 'done'))) {
+      fs.mkdirSync(dir, { recursive: true });
+      const scale = m.w ? `,scale=${Math.round(m.w)}:${Math.round(m.h)}:force_original_aspect_ratio=increase,crop=${Math.round(m.w)}:${Math.round(m.h)}` : '';
+      execFileSync('ffmpeg', ['-v', 'error', '-y', '-ss', String(m.start || 0), '-i', file, '-frames:v', String(m.frames + 1), '-vf', `fps=${fps}${scale}`, '-q:v', '2', path.join(dir, '%05d.jpg')]);
+      fs.writeFileSync(path.join(dir, 'done'), '1');
+    }
+    seq[m.key] = { dir: fsUrl(dir), count: fs.readdirSync(dir).filter((f) => f.endsWith('.jpg')).length };
+  }
+  return { ...p, __seq: seq };
+}
+
 /** Build the IS Spec in Node (comps are pure) from a comp name, a .spec.json or an edit plan .json */
 export async function resolveSpec(target, a) {
   const { buildSpec } = await import('../runtime/comps/index.js');
@@ -108,13 +136,28 @@ export async function openStage(target, a) {
   const page = await browser.newPage({ viewport: { width: 1280, height: 1280 } });
   page.on('console', (m) => { if (m.type() === 'error') console.error('[page]', m.text()); });
   page.on('pageerror', (e) => console.error('[page]', e.message));
-  // a bespoke page (e.g. a GSAP scene using runtime/gsap-bridge.js) or the standard stage
-  const sq = target.endsWith('.html') ? { query: '', specFile: null, page: fsUrl(path.resolve(target)) } : await stageQuery(target, a);
+  // a bespoke page (e.g. a GSAP scene using runtime/gsap-bridge.js), a motion scene (DOM engine) or the standard stage
+  let sq;
+  if (target.endsWith('.html')) sq = { query: '', specFile: null, page: fsUrl(path.resolve(target)) };
+  else if (await isMotion(target)) {
+    const def = (await motionScenes())[target];
+    const base = path.resolve(a.base || process.cwd());
+    const cache = path.resolve(a.cache || path.join(base, '.ink-signal-cache'));
+    fs.mkdirSync(cache, { recursive: true });
+    const p = await prepareMotionMedia(def, readParams(a), base, cache);
+    const pf = path.join(cache, `motion-${process.pid}-${Date.now()}.params.json`);
+    fs.writeFileSync(pf, JSON.stringify(p));
+    const { resolveParams } = await import('../runtime/motion/scene.js');
+    const fmt = (await import('../runtime/core.js')).T.format[resolveParams(def, p).format] || { width: 1080, height: 1920 };
+    await page.setViewportSize({ width: p.width || fmt.width, height: p.height || fmt.height });
+    sq = { specFile: pf, page: `/stage/motion.html?scene=${encodeURIComponent(target)}&paramsUrl=${encodeURIComponent(fsUrl(pf))}&base=${encodeURIComponent(fsUrl(base) + '/')}&render=1` };
+  } else sq = await stageQuery(target, a);
   await page.goto(sq.page ? `http://127.0.0.1:${srv.port}${sq.page}` : `http://127.0.0.1:${srv.port}/stage/index.html?${sq.query}`);
   await page.waitForFunction(() => window.__IS_READY || window.__IS_ERROR, null, { timeout: 180000 });
   const err = await page.evaluate(() => window.__IS_ERROR);
   if (err) { await browser.close(); srv.close(); throw new Error(err); }
   await page.evaluate(() => {
+    if (window.IS && window.IS.dom) return; // DOM scenes are captured with screenshots (see grabDom)
     // subframe accumulation for real motion blur (premultiplied average)
     window.__grab = async (f, n = 1, shutter = 0.5) => {
       const c = window.IS.canvas;
@@ -132,16 +175,31 @@ export async function openStage(target, a) {
       return t.toDataURL('image/png');
     };
   });
-  const meta = await page.evaluate(() => ({ width: IS.spec.width, height: IS.spec.height, fps: IS.spec.fps, duration: IS.spec.duration, name: IS.spec.name, background: IS.spec.background, markers: IS.spec.markers }));
-  return { page, browser, srv, meta, close: async () => { await browser.close(); srv.close(); if (sq.specFile) fs.rmSync(sq.specFile, { force: true }); } };
+  const meta = await page.evaluate(() => ({ width: IS.spec.width, height: IS.spec.height, fps: IS.spec.fps, duration: IS.spec.duration, name: IS.spec.name, background: IS.spec.background, markers: IS.spec.markers, dom: !!IS.dom, cues: IS.cues || [] }));
+  const alphaShot = !meta.background;
+  /** DOM scenes: seek, then screenshot the stage. n > 1 → n subframes across the shutter (blended by ffmpeg) */
+  const grabDom = async (f, n = 1, shutter = 0.5) => {
+    const out = [];
+    for (let i = 0; i < n; i++) {
+      const ff = n <= 1 ? f : f - shutter / 2 + (shutter * (i + 0.5)) / n;
+      await page.evaluate((x) => window.IS.seek(x), ff);
+      out.push(await page.screenshot({ clip: { x: 0, y: 0, width: meta.width, height: meta.height }, type: 'png', omitBackground: alphaShot }));
+    }
+    return out;
+  };
+  /** one frame as PNG buffer(s): canvas stages blend subframes in the page, DOM stages return n subframes */
+  const grab = async (f, n = 1) => (meta.dom ? grabDom(f, n) : [b64png(await page.evaluate(([fr, nn]) => window.__grab(fr, nn), [f, n]))]);
+  return { page, browser, srv, meta, grab, close: async () => { await browser.close(); srv.close(); if (sq.specFile) fs.rmSync(sq.specFile, { force: true }); } };
 }
 
 const b64png = (dataUrl) => Buffer.from(dataUrl.slice(dataUrl.indexOf(',') + 1), 'base64');
 
-function ffmpegArgs(out, meta, a) {
+function ffmpegArgs(out, meta, a, sub = 1) {
   const ext = path.extname(out).toLowerCase();
   const alpha = a.alpha || (!meta.background && ext !== '.mp4');
-  const inp = ['-y', '-hide_banner', '-loglevel', 'error', '-f', 'image2pipe', '-framerate', String(meta.fps), '-c:v', 'png', '-i', '-'];
+  const inp = ['-y', '-hide_banner', '-loglevel', 'error', '-f', 'image2pipe', '-framerate', String(meta.fps * sub), '-c:v', 'png', '-i', '-'];
+  if (sub > 1) inp.push('-vf', `format=${alpha ? 'gbrap' : 'gbrp'},tmix=frames=${sub}:weights='${Array(sub).fill(1).join(' ')}',select='eq(mod(n\\,${sub})\\,${sub - 1})',setpts=N/(${meta.fps}*TB)`, '-r', String(meta.fps));
+  if (out.endsWith('/') || path.extname(out) === '') return [...inp, '-f', 'image2', path.join(out, `${meta.name}_%05d.png`)];
   if (ext === '.mov') return [...inp, '-c:v', 'prores_ks', '-profile:v', alpha ? '4444' : '3', '-pix_fmt', alpha ? 'yuva444p10le' : 'yuv422p10le', '-vendor', 'apl0', out];
   if (ext === '.webm') return [...inp, '-c:v', 'libvpx-vp9', '-pix_fmt', alpha ? 'yuva420p' : 'yuv420p', '-b:v', '0', '-crf', '24', '-auto-alt-ref', '0', out];
   return [...inp, '-c:v', 'libx264', '-pix_fmt', 'yuv420p', '-crf', '16', '-preset', 'medium', '-movflags', '+faststart', out];
@@ -156,28 +214,34 @@ export async function render(target, a) {
   const t0 = Date.now();
   const asFrames = out.endsWith('/') || path.extname(out) === '';
   let ff = null;
-  if (asFrames) fs.mkdirSync(out, { recursive: true });
+  const sub = meta.dom ? Math.max(1, n) : 1;
+  if (asFrames && !(meta.dom && sub > 1)) fs.mkdirSync(out, { recursive: true });
   else {
+    if (asFrames) fs.mkdirSync(out, { recursive: true });
     fs.mkdirSync(path.dirname(path.resolve(out)), { recursive: true });
-    ff = spawn('ffmpeg', ffmpegArgs(out, meta, a), { stdio: ['pipe', 'inherit', 'inherit'] });
+    ff = spawn('ffmpeg', ffmpegArgs(out, meta, a, sub), { stdio: ['pipe', 'inherit', 'inherit'] });
   }
   for (let f = from; f < to; f++) {
-    const png = b64png(await page.evaluate(([fr, nn]) => window.__grab(fr, nn), [f, n]));
-    if (asFrames) fs.writeFileSync(path.join(out, `${meta.name}_${String(f).padStart(5, '0')}.png`), png);
-    else if (!ff.stdin.write(png)) await new Promise((r) => ff.stdin.once('drain', r));
+    const pngs = await st.grab(f, n);
+    for (const png of pngs) {
+      if (!ff) fs.writeFileSync(path.join(out, `${meta.name}_${String(f).padStart(5, '0')}.png`), png);
+      else if (!ff.stdin.write(png)) await new Promise((r) => ff.stdin.once('drain', r));
+    }
     if ((f - from) % 15 === 0) process.stdout.write(`\r${meta.name}: frame ${f + 1}/${to}`);
   }
   if (ff) { ff.stdin.end(); await new Promise((r, j) => ff.on('close', (c) => (c === 0 ? r() : j(new Error('ffmpeg exited ' + c))))); }
   await st.close();
   process.stdout.write(`\r${meta.name}: ${to - from} frames → ${out} (${((Date.now() - t0) / 1000).toFixed(1)}s)\n`);
-  if (!a.noMarkers) fs.writeFileSync(out.replace(/\/?$/, '').replace(/\.[^.]+$/, '') + '.markers.json', JSON.stringify({ fps: meta.fps, duration: meta.duration, markers: meta.markers }, null, 1));
+  const stem = out.replace(/\/?$/, '').replace(/\.[^.]+$/, '');
+  if (!a.noMarkers) fs.writeFileSync(stem + '.markers.json', JSON.stringify({ fps: meta.fps, duration: meta.duration, markers: meta.markers }, null, 1));
+  if (meta.cues && meta.cues.length && !a.noMarkers) fs.writeFileSync(stem + '.cues.json', JSON.stringify({ fps: meta.fps, duration: meta.duration / meta.fps, from: from / meta.fps, cues: meta.cues.filter((c) => c.t >= from / meta.fps && c.t <= to / meta.fps) }, null, 1));
   return { out, meta };
 }
 
 export async function still(target, a) {
   const st = await openStage(target, a);
   const f = parseFloat(a.frame ?? 0);
-  const png = b64png(await st.page.evaluate(([fr, nn]) => window.__grab(fr, nn), [f, parseInt(a.blur ?? 1, 10)]));
+  const png = st.meta.dom ? (await st.grab(f, 1))[0] : b64png(await st.page.evaluate(([fr, nn]) => window.__grab(fr, nn), [f, parseInt(a.blur ?? 1, 10)]));
   const out = a.out || `${st.meta.name}_${f}.png`;
   fs.writeFileSync(out, png);
   await st.close();
@@ -187,10 +251,10 @@ export async function still(target, a) {
 /** contact sheet of several frames, for review */
 export async function sheet(target, a) {
   const st = await openStage(target, a);
-  const frames = String(a.frames || '0,15,30,45,60,90').split(',').map(Number).filter((f) => f < st.meta.duration);
+  const frames = (a.auto ? Array.from({ length: +a.auto }, (_, i) => Math.round(((i + 0.5) / +a.auto) * st.meta.duration)) : a.times ? String(a.times).split(',').map((x) => Math.round(Number(x) * st.meta.fps)) : String(a.frames || '0,15,30,45,60,90').split(',').map(Number)).filter((f) => f < st.meta.duration);
   const cols = parseInt(a.cols || Math.min(frames.length, 6), 10), sc = parseFloat(a.scale || (st.meta.width > st.meta.height ? 0.25 : 0.2));
   const urls = [];
-  for (const f of frames) urls.push(await st.page.evaluate(([fr]) => window.__grab(fr, 1), [f]));
+  for (const f of frames) urls.push(st.meta.dom ? 'data:image/png;base64,' + (await st.grab(f, 1))[0].toString('base64') : await st.page.evaluate(([fr]) => window.__grab(fr, 1), [f]));
   const data = await st.page.evaluate(async ([urls, frames, cols, sc, w, h]) => {
     const cw = Math.round(w * sc), ch = Math.round(h * sc), rows = Math.ceil(urls.length / cols), pad = 8, lab = 22;
     const c = document.createElement('canvas'); c.width = cols * (cw + pad) + pad; c.height = rows * (ch + pad + lab) + pad;
@@ -215,6 +279,9 @@ async function main() {
   if (cmd === 'list' || !cmd) {
     const { COMPS } = await import('../runtime/comps/index.js');
     for (const [k, d] of Object.entries(COMPS)) console.log(`${k.padEnd(15)} [${d.kind}] (${d.formats.join('/')})  ${d.description}`);
+    const SC = await motionScenes();
+    console.log('\n— motion scenes (Signal Motion engine) —');
+    for (const [k, d] of Object.entries(SC)) console.log(`${k.padEnd(15)} [${d.kind}] (${d.formats.join('/')})  ${d.description}`);
     if (!cmd) console.log('\nCommands: list | spec | render | still | sheet  (see header of render/cli.mjs)');
     return;
   }

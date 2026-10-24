@@ -8,6 +8,8 @@
 @font-face{font-family:'IS noteSoft';src:url('../fonts/Caveat-SemiBold.ttf') format('truetype');font-display:block}
 @font-face{font-family:'IS data';src:url('../fonts/JetBrainsMono-Bold.ttf') format('truetype');font-display:block}
 @font-face{font-family:'IS dataSoft';src:url('../fonts/JetBrainsMono-Medium.ttf') format('truetype');font-display:block}
+@font-face{font-family:'IS ui';src:url('../fonts/Archivo-Variable.woff2') format('woff2');font-weight:100 900;font-stretch:62% 125%;font-display:block}
+@font-face{font-family:'IS italic';src:url('../fonts/Archivo-Italic-Variable.woff2') format('woff2');font-weight:100 900;font-stretch:62% 125%;font-display:block}
 :root{
   --is-ink:#0E0E0E;
   --is-night:#0B0B0C;
@@ -20,6 +22,14 @@
   --is-pen:#2B44E0;
   --is-white:#FFFFFF;
   --is-muted:#5A5A58;
+  --is-graphite:#8A8782;
+  --is-rule:#DEDCD5;
+  --is-paperDeep:#E3E1DA;
+  --is-skeleton:#E6E3DD;
+  --is-nightRaised:#232325;
+  --is-nightSunken:#111112;
+  --is-fog:#8E8E8B;
+  --is-nightSkeleton:#2C2C2E;
   --is-ease-snap:cubic-bezier(0.16,1,0.3,1);
   --is-ease-stamp:cubic-bezier(0.34,1.56,0.64,1);
   --is-ease-wipe:cubic-bezier(0.76,0,0.24,1);
@@ -36,4 +46,58 @@
   --is-font-noteSoft:'IS noteSoft';
   --is-font-data:'IS data';
   --is-font-dataSoft:'IS dataSoft';
+  --is-spring-morph:15 0.84;
+  --is-spring-fast:27 0.86;
+  --is-spring-slow:12.5 0.9;
+  --is-spring-soft:10 0.95;
+  --is-spring-camera:7.5 1;
+  --is-spring-pop:16 0.7;
+  --is-spring-stamp:22 0.6;
+  --is-spring-settle:14 0.82;
+  --is-spring-drop:18 0.72;
+  --is-spring-instant:1000000 1;
+  --is-radius-card:28px;
+  --is-radius-panel:20px;
+  --is-radius-control:14px;
+  --is-radius-chip:10px;
+  --is-radius-tile:24px;
+  --is-radius-pill:999px;
+  --is-shadow-card:0 1px 2px rgba(14,14,14,.06), 0 14px 36px -12px rgba(14,14,14,.20);
+  --is-shadow-lift:0 2px 4px rgba(14,14,14,.08), 0 28px 60px -18px rgba(14,14,14,.32);
+  --is-shadow-nightCard:0 0 0 1px #2A2A2A, 0 20px 50px -20px rgba(0,0,0,.7);
+  --is-shadow-none:none;
+}
+.is-paper{
+  --ui-canvas:var(--is-paper);
+  --ui-surface:var(--is-white);
+  --ui-surfaceAlt:var(--is-paperNote);
+  --ui-sunken:var(--is-paperDeep);
+  --ui-border:var(--is-rule);
+  --ui-text:var(--is-ink);
+  --ui-textMuted:var(--is-graphite);
+  --ui-skeleton:var(--is-skeleton);
+  --ui-control:var(--is-ink);
+  --ui-onControl:var(--is-white);
+  --ui-grid:rgba(14,14,14,0.06);
+  --ui-dot:rgba(14,14,14,0.16);
+  --ui-cursorFill:var(--is-ink);
+  --ui-cursorStroke:var(--is-white);
+  --ui-shadow:var(--is-shadow-card);
+}
+.is-night{
+  --ui-canvas:var(--is-night);
+  --ui-surface:var(--is-nightPanel);
+  --ui-surfaceAlt:var(--is-nightRaised);
+  --ui-sunken:var(--is-nightSunken);
+  --ui-border:var(--is-nightLine);
+  --ui-text:var(--is-white);
+  --ui-textMuted:var(--is-fog);
+  --ui-skeleton:var(--is-nightSkeleton);
+  --ui-control:var(--is-white);
+  --ui-onControl:var(--is-ink);
+  --ui-grid:rgba(255,255,255,0.045);
+  --ui-dot:rgba(255,255,255,0.12);
+  --ui-cursorFill:var(--is-white);
+  --ui-cursorStroke:var(--is-ink);
+  --ui-shadow:var(--is-shadow-nightCard);
 }

@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ink &amp; Signal — motion stage</title>
+<script type="importmap">
+{ "imports": { "three": "../runtime/vendor/three.module.min.js", "three/addons/": "../runtime/vendor/addons/" } }
+</script>
+<link rel="stylesheet" href="../tokens/tokens.css">
+<style>
+  html, body { margin: 0; background: transparent; overflow: hidden; }
+  #wrap { position: absolute; left: 0; top: 0; transform-origin: 0 0; }
+  body.preview { background: #141414; color: #ECEBE6; font: 13px/1.4 system-ui, sans-serif; height: 100vh; }
+  body.preview #wrap { box-shadow: 0 0 0 1px #2A2A2A; }
+  #bar { display: none; }
+  body.preview #bar { display: flex; position: fixed; left: 0; right: 0; bottom: 0; gap: 12px; align-items: center; padding: 10px 16px; background: #0E0E0E; }
+  #bar input[type=range] { flex: 1; accent-color: #F2362B; }
+  #bar button { background: #F2362B; color: #0E0E0E; border: 0; padding: 7px 14px; font-weight: 700; cursor: pointer; }
+  #err { color: #F2362B; white-space: pre-wrap; padding: 16px; font: 13px monospace; position: fixed; top: 0; left: 0; }
+</style>
+</head>
+<body>
+<div id="wrap"><div id="stage"></div></div>
+<div id="bar"><button id="play" type="button">Pause</button><input id="scrub" type="range" min="0" value="0" step="1" aria-label="Frame"><span id="fc">0</span></div>
+<div id="err"></div>
+<script type="module">
+import { SCENES } from '../runtime/motion/scenes/index.js';
+import { mountScene } from '../runtime/motion/scene.js';
+const q = new URLSearchParams(location.search);
+try {
+  const name = q.get('scene') || 'x-hype';
+  const def = SCENES[name];
+  if (!def) throw new Error(`Unknown motion scene "${name}". Available: ${Object.keys(SCENES).join(', ')}`);
+  let params = q.get('params') ? JSON.parse(q.get('params')) : {};
+  if (q.get('paramsUrl')) params = { ...(await (await fetch(q.get('paramsUrl'))).json()), ...params };
+  if (q.get('format')) params.format = q.get('format');
+  if (q.get('base')) params.__base = q.get('base');
+  await Promise.all([...document.fonts].map((f) => f.load().catch(() => {})));
+  await document.fonts.ready;
+  const stage = document.getElementById('stage');
+  const m = mountScene(stage, def, params);
+  if (m.ready) await m.ready;
+  if (m.ctx.ready) await Promise.all(m.ctx.ready);
+  window.IS = { dom: true, spec: m.meta, cues: m.cues, canvas: null, async seek(f) { m.seek(f); if (m.ctx.after) await Promise.all(m.ctx.after.map((fn) => fn(f))); } };
+  await window.IS.seek(q.get('frame') ? +q.get('frame') : 0);
+  if (!q.has('render')) {
+    document.body.classList.add('preview');
+    const wrap = document.getElementById('wrap');
+    const fit = () => { const k = Math.min(innerWidth / m.meta.width, (innerHeight - 52) / m.meta.height); wrap.style.transform = `translate(${(innerWidth - m.meta.width * k) / 2}px,4px) scale(${k})`; };
+    fit(); addEventListener('resize', fit);
+    const scrub = document.getElementById('scrub'), fc = document.getElementById('fc'), btn = document.getElementById('play');
+    scrub.max = m.meta.duration - 1;
+    let f = 0, playing = true, last = performance.now(), busy = false;
+    btn.onclick = () => { playing = !playing; btn.textContent = playing ? 'Pause' : 'Play'; };
+    scrub.oninput = () => { f = +scrub.value; playing = false; btn.textContent = 'Play'; };
+    const tick = async (now) => {
+      if (!busy) { busy = true; if (playing) f = (f + ((now - last) / 1000) * m.meta.fps) % m.meta.duration; last = now; await window.IS.seek(f); scrub.value = Math.floor(f); fc.textContent = `${Math.floor(f)} / ${m.meta.duration} · ${(f / m.meta.fps).toFixed(2)}s · ${m.meta.name}`; busy = false; }
+      requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+  }
+  window.__IS_READY = true;
+} catch (e) {
+  document.getElementById('err').textContent = String((e && e.stack) || e);
+  window.__IS_ERROR = String((e && e.stack) || e);
+}
+</script>
+</body>
+</html>
