@@ -1,116 +1,87 @@
 ---
-name: ink-signal-reels
-description: Edit Instagram Reels and YouTube videos in the Ink & Signal motion style (graph paper, night footage, one signal red, selection-box titles, tickers, handwriting, 3D gizmo titles) using the ink-signal library, and hand edits to After Effects, Premiere Pro or DaVinci Resolve.
+name: ink-signal
+description: Make videos in the Ink & Signal motion design system with the ink-signal library — Instagram Reels and YouTube edits, SaaS promos and product demos, motion B-roll for talking heads, infographics, card animations, kinetic titles, sound design — and hand them to After Effects, Premiere Pro or DaVinci Resolve.
 ---
 
-# Ink & Signal — making Reels and YouTube videos
+# Ink & Signal
 
-The `ink-signal/` library (attached folder or zip) is a deterministic motion system: tokens → components →
-compositions → renders / NLE timelines. Use it for every Reel or YouTube edit the user asks for so their
-videos stay consistent. Never restyle by hand; change tokens or params instead.
+The `ink-signal/` library (attached folder or zip) is a deterministic motion design system:
+**tokens → two engines → templates → renders, sound and NLE timelines.** Use it for every video the user asks
+for so their work stays consistent. Never restyle by hand: change params, or tokens for the whole brand.
 
-## 0. Set up (first time in a session)
+- **IS Spec engine** (canvas; rebuilt natively in After Effects): titles, A-roll overlays, captions, transitions, 3D.
+- **Signal Motion engine** (browser; springs, camera, cursor, UI kit, charts, kinetic type): explainers, B-roll,
+  infographics, cards, kinetic titles, object transitions. Both render through the same CLI and mix in one edit plan.
 
-- Find the library root (folder containing `tokens/ink-signal.tokens.json`). If it came as a zip, unzip it.
-- Check tools: `node -v` (18+), `ffmpeg -version`, `python3 -c "import numpy"`. Install what's missing:
-  `npm install && npx playwright install chromium` inside the library.
-- Read `tokens/ink-signal.tokens.json` (rules at the bottom) and `docs/RECIPES.md` once.
-- `node render/cli.mjs list` shows every composition and its params live in `runtime/comps/*.js` (`defaults`).
+## 0. Set up (once per session)
 
-## 1. Inputs to collect
+1. Find the library root (the folder with `tokens/ink-signal.tokens.json`); unzip it if it came as a zip.
+2. Check tools: `node -v` (18+), `ffmpeg -version`, `python3 -c "import numpy, PIL"`. Inside the library:
+   `npm install && npx playwright install chromium` if Playwright is missing.
+3. `node render/cli.mjs list` prints every template; `docs/CATALOG.md` has their params.
 
-Clips (paths), what the video is about, the hook line, chapter titles, handle (@...), accent (default
-signal red #F2362B), music (licensed for the platform), and a transcript (SRT/VTT or Whisper JSON) for captions.
-If something is missing and the user is present, ask once; otherwise use placeholders like `[Your Name]` and say so.
+## 1. Route the request
 
-## 2. Analyse
+| The user wants… | Read, then follow |
+|---|---|
+| a Reel / YouTube edit from their clips (captions, chapters, beat cuts, titles) | `skills/ink-signal-reels/SKILL.md` |
+| a SaaS promo, launch sting, product demo, “how it works”, a one-take loop | `skills/ink-signal-explainer/SKILL.md` (+ `docs/EXPLAINERS.md`) |
+| motion graphics / B-roll / cutaways over a talking-head video | `skills/ink-signal-broll/SKILL.md` (+ `docs/BROLL.md`) |
+| sound effects, music, a mix that's ready to post | `skills/ink-signal-sound/SKILL.md` (+ `docs/SOUND.md`) |
+| one graphic: a chart, a big number, a card animation, a title, a transition | pick from `docs/CATALOG.md`, render it (below) |
+| a moment no template covers | `docs/MOTION-ENGINE.md` (write a scene) or `runtime/comps/` (IS Spec comp) |
+| title behind the person | `tools/separate.py` → `t-behind` (see the reels skill) |
 
-```bash
-ffprobe -v error -show_entries format=duration:stream=width,height,r_frame_rate -of compact clip.mp4
-python3 render/beats.py music.mp3 --out beats.json          # bpm, beats, downbeats, drop
-python3 tools/words.py talk.srt --from 4.2 --to 9.8 --out words_talk.json   # words for one clip window
-```
-
-## 3. Storyboard on the beat grid
-
-Pick a structure from `docs/RECIPES.md`. Every cut on a downbeat (`"snap": "downbeat"` + beats in the plan),
-hook in the first 2 s, one idea per shot, titles held ≥ 18 frames after they land. When the user is present,
-show the storyboard as a short table (time · shot · graphic) before rendering.
-
-## 4. Write the edit plan (`plan.json`, next to the clips)
-
-```json
-{ "name": "...", "format": "reel", "fps": 30, "accent": "#F2362B",
-  "audio": { "music": "music.mp3", "musicGainDb": -9, "lufs": -14 },
-  "beats": [...], "downbeats": [...], "snap": "downbeat",
-  "timeline": [
-    { "type": "comp", "comp": "hook", "duration": 3.0, "params": { "word": "Hell", "note": "yep, that's me", "src": "clips/me_cutout.png" } },
-    { "type": "transition", "comp": "tr-torn", "params": { "color": "ink" } },
-    { "type": "clip", "src": "clips/talk.mp4", "in": 4.2, "out": 9.8, "look": "aroll",
-      "overlays": [ { "comp": "ov-captions", "at": 0, "params": { "words": "<contents of words_talk.json>" } },
-                    { "comp": "ov-chip", "at": 0.2, "params": { "text": "Step 01", "accentText": "/ 03" } } ] },
-    { "type": "comp", "comp": "chapter", "duration": 2.4, "params": { "title": "Setup", "sub": "Light · Desk · Cam", "src": "clips/broll.mp4" } },
-    { "type": "transition", "comp": "tr-flash" },
-    { "type": "comp", "comp": "endcard", "duration": 3.0, "params": { "handle": "@..." } }
-  ] }
-```
-
-- `comp` items: any composition; `params` override its `defaults`; `src` puts real footage behind titles.
-- `clip` items: `in`/`out` in source seconds; `look` = `aroll` (clean) or `behindTitles` (blur, −0.3 EV, push-in).
-- `overlays` play over a clip (`at` = seconds into the clip). `transition` items sit on the cut between neighbours.
-- Words for `ov-captions` are seconds relative to the overlay start.
-
-## 5. Review before the full render
+## 2. The commands
 
 ```bash
-node render/cli.mjs sheet plan.json --frames 0,30,60,90,120,150,180 --out review.png
+node render/cli.mjs sheet <name|plan.json> --format reel|yt|square --params '{…}' --auto 9 --out check.png   # LOOK at it
+node render/cli.mjs render <name|plan.json> --params-file p.json --blur 1 --out draft.mp4                    # review copy
+node render/cli.mjs render <name|plan.json> --params-file p.json --blur 4 --out final.mp4                    # + .cues.json
+node render/cli.mjs render <overlay> --params '{"transparent":true}' --out overlay.mov                       # ProRes 4444 alpha
+node render/build-reel.mjs plan.json --out reel.mp4 --blur 3          # clips + graphics + music, −14 LUFS
+node render/broll.mjs broll.plan.json                                  # B-roll clips + TIMING + preview + review page
+python3 render/sound.py --video x.mp4 --cues x.cues.json --out sound/  # measured SFX pass
+node render/nle.mjs plan.json --out pkg/                               # After Effects / Premiere / Resolve package
 ```
-Look at the sheet (Read the PNG). Fix: text inside Reels safe zones (top 220, bottom 420, right 140 px),
-nothing overlapping, titles fit (comps auto-shrink, but keep titles to 1–2 words), captions ≤ 2 lines.
 
-## 6. Render and deliver
+Always render a sheet and look at it (Read the PNG) before a full render; fix anything clipped, overlapping,
+unreadable, off-brand or empty. Send a draft before the final when the user is around; finals with `--blur 4`
+take minutes (each subframe is a screenshot) — say so before starting.
 
-```bash
-node render/build-reel.mjs plan.json --out final.mp4 --blur 3      # graphics + clips + music, −14 LUFS / −1 dBTP
-```
-Check duration and loudness (`ffmpeg -i final.mp4 -af loudnorm=print_format=summary -f null -`), then send the MP4.
+## 3. Design rules (non-negotiable)
 
-## 7. Hand-off to After Effects / Premiere Pro / DaVinci Resolve
+**Brand layer.** One loud colour: the accent (signal red `#F2362B` unless the user's brand replaces it). Ink
+`#0E0E0E`, paper `#ECEBE6` with a graph grid, night `#0B0B0C`. Titles in Archivo Expanded Black, caps, 1–2 words,
+entering as a design-tool selection (box 6f → handles 4f → land 12f). HUD labels in corners (JetBrains Mono /
+Archivo Expanded), tickers linear, handwriting (Caveat, pen blue `#2B44E0` on paper, white on night) with an arrow
+to the thing, the glyph trio (star · sparkle · plus) as the stamp. Brand devices have square edges.
 
-```bash
-node render/nle.mjs plan.json --out pkg      # renders/ (ProRes, 4444 alpha for overlays), manifest.json, timeline.xml, edit.spec.json, plates/
-```
-- After Effects (native, editable): run `integrations/after-effects/InkSignal.jsx`, then `InkSignal.buildFromPackage("/abs/pkg")`.
-  Single graphic: `node render/cli.mjs spec chapter --params '{...}' --out chapter.spec.json` → `InkSignal.buildFromSpec("/abs/chapter.spec.json")`.
-- Premiere Pro: `InkSignalPPro.assemble("/abs/pkg")` via the MCP's ExtendScript tool, or import `timeline.xml`.
-- DaVinci Resolve: `exec(open(".../ink_signal_resolve.py").read()); assemble("/abs/pkg")` (or import it as a module; see its README) via the MCP's Python tool, or import `timeline.xml`.
-- Single overlays for any NLE: `node render/cli.mjs render ov-lowerthird --format yt --params '{"name":"..."}' --out lt.mov` (alpha).
-See `integrations/*/README.md` for exact MCP calls.
+**Interface layer** (product UI rebuilt in the brand). Paper canvas, white surfaces with a 1.5 px rule border and a
+soft shadow (night: raised panels, hairline), Archivo for UI text, JetBrains Mono for code/numbers, Lucide line
+icons at one stroke, one accent. Rounded corners only here (`tokens.ui.radius`). Springs (`tokens.springs`), never
+bouncy cameras; content swaps with a short blur; the cursor arrives a beat before it clicks.
 
-## Style rules (non-negotiable)
+**Motion.** One idea per shot; titles hold ≥ 18 frames after landing; big moves on beats, type on 1/16 notes; cuts
+on downbeats; transitions are objects (flood, dot, bars, torn paper, zoom-through, ticker) or a 2-frame flash. In
+calm pieces the camera is the editor (push in, ride, pull back), no hard cuts.
 
-- One loud colour: the accent. Ink #0E0E0E, paper #ECEBE6, pen blue #2B44E0 for handwriting only.
-- Titles: Archivo Expanded Black, caps, 1–2 words, enter as a selection (box 6f → handles 4f → land 12f).
-- Subtitles: 2–3 words joined with " · ". HUD labels in corners. Handwriting lowercase, with an arrow to the thing.
-- Tickers linear, never eased. Cuts on downbeats. Transitions: hard cut, 2-frame flash, torn wipe, ticker wipe, paper roll.
-- Behind titles footage is blurred, darkened and pushed in. A-roll stays clean.
-- 3D: long lens, eased move-then-hold cameras, red faces / ink sides, key light top-left. No chrome, glow, neon, lens flares, camera shake, emoji.
-- No full stops in titles; punch words and the end card may use one.
+**Truth.** Never invent numbers, customer counts, ratings, testimonials, quotes or logos. Without real figures use
+relative bars, skeleton lines and labels from the script; say what is illustrative. Calls to action only with a URL
+or offer the user gave. Third-party logos only when supplied.
 
-## Going beyond the templates
+**Sound.** Real recorded sounds only (bundled CC0), one per interaction, measured to −14 LUFS / < −1.5 dBTP on the
+exported file; never claim it sounds good — give five timestamps to check.
 
-Need a moment that doesn't exist? Add a composition in `runtime/comps/` built from `runtime/components.js`
-(selectionTitle, ticker, hud, glyphRow, handNote, arrow, circleMark, polaroid, cutout, captions, lowerThird,
-stepChip, punchWord, letterRise, callout, tornWipe, tickerWipe, flash, three) and register it in
-`runtime/comps/index.js`. New 3D scenes go in `runtime/three/scenes.js` using `three/kit.js`
-(materials, lights, floor, textMesh, glyphMesh, gizmo, cameraRig, orbit, fitDistance).
-Keep it deterministic: no `Math.random` (use `rng(seed)`), no clocks, no CSS animations — every value from the frame.
-Durations come from `tokens.duration`, easing names from `tokens.ease`. Render a sheet and look at it before using it.
+Banned: second loud colour, gradients on type, glows, lens flares, RGB split, camera shake, emoji, bouncy
+easing on large moves, text in the Reels UI zones (top 220, bottom 420, right 140 px).
 
-## Gotchas
+## 4. Gotchas
 
-- Fonts must exist in `fonts/`; NLEs need them installed on the machine.
-- Videos are pre-extracted to JPEG frames in `.ink-signal-cache/` next to the plan (exact seeking, any codec); delete it to free space.
-- 3D renders on CPU WebGL in headless mode: fine for Reels, slower with `--blur`. Use `--blur 1` for previews.
-- `edit` plans with beats: if `snap` moves a cut, durations change; re-check overlay timing on the sheet.
-- Music must be licensed for the platform; loudness target −14 LUFS integrated, −1 dBTP.
+- Fonts live in `fonts/`; NLEs need them installed. Videos are pre-extracted to JPEG frames in `.ink-signal-cache/`
+  next to the plan (delete it to free space); motion scenes inside plans are cached there as PNG sequences.
+- Motion-scene params named `accent` are colours; chart highlight indices are `focus`.
+- B-roll `at` times are clip-local seconds (word time − clip in). Edit-plan overlay words are relative to the overlay start.
+- 3D renders on CPU WebGL in headless mode: fine, slower with blur.
+- Motion scenes render at any size (`"width"`, `"height"`, `"fps"` params, e.g. a 4K or 720p video's): the layout is
+  the same picture as 1080p, drawn at that resolution.

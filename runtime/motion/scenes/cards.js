@@ -185,7 +185,7 @@ export const cardQuote = defineScene({
     const ki = p.key ? p.quote.indexOf(p.key) : -1; const parts = [];
     const pushW = (s) => s.split(/(\s+)/).filter(Boolean).forEach((x) => parts.push({ s: x, sp: /^\s+$/.test(x) }));
     if (ki >= 0) { pushW(p.quote.slice(0, ki)); parts.push({ s: p.key, key: true }); pushW(p.quote.slice(ki + p.key.length)); } else pushW(p.quote);
-    const units = parts.map((q) => { const sp = h('span', { text: q.s, style: { display: 'inline', whiteSpace: q.key ? 'normal' : 'pre' } }); qt.appendChild(sp); return { el: sp, inner: sp, ch: q.s, space: q.sp, key: q.key }; });
+    const units = parts.map((q) => { const sp = h('span', { text: q.s, style: { display: 'inline', whiteSpace: q.sp || q.key ? 'normal' : 'nowrap' } }); qt.appendChild(sp); return { el: sp, inner: sp, ch: q.s, space: q.sp, key: q.key }; });
     const kU = units.find((x) => x.key);
     const wEnd = 0.6 + units.filter((x) => !x.space).length * 0.05;
     const hl = kU ? highlightInline(kU.inner, { at: wEnd + 0.3, textOn: T.color.ink, dur: 0.7 }) : null;

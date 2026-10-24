@@ -31,6 +31,38 @@ B-roll montage on beats (cut every bar, `ov-hud` on top) → `tr-ticker` → A-r
 - **Talking**: `ov-lowerthird` once in the first minute, `ov-callout` for anything on the desk, `ov-note` for asides.
 - **End**: `endcard` (yt) — slots are positioned for YouTube end-screen elements (video, playlist, subscribe).
 
+## Reels with motion scenes (v3)
+
+Motion scenes drop into the same edit plan as `"comp"` items, overlays or transitions.
+
+### 20 s — one stat that matters
+`t-countdown` (1 bar) → `tr-bars` → A-roll with captions (2 bars) → `ig-counter` with the real figure (1 bar) →
+`ig-compare` before / after (2 bars) → `tr-flood` → A-roll payoff + `ov-punch` (1 bar) → `endcard`.
+
+### 30 s — tool / app tip
+`t-behind` with the tool's name (1 bar) → A-roll + captions → B-roll cutaways on the words that describe something
+to see: `mb-search` (finding it), `mb-toggles` (the setting), `mb-slider` (the effect) → `card-flip` before / after →
+`t-stack` three-line recap on the beat → `endcard`.
+
+### 45 s — "3 things" list
+`t-wall` hook (loudest beat) → per item: `mb-chapter` “Up next” (1 bar) → A-roll + captions + one graphic
+(`card-bento`, `ig-bars`, `card-notify` …) → `tr-dot` between items → `card-stack` recap of the three → `endcard`.
+
+## SaaS and product explainers (v3)
+
+| Length | Use | Structure |
+|---|---|---|
+| 6 s | social sting, ad bumper | `t-slam` (name) → `t-highlight` (the one thing) |
+| 15 s | launch teaser | `x-hype` on 8 bars of the track |
+| 30 s | ad, Product Hunt | `x-hype` (8 bars) → `tr-flood` → `x-demo` with 1 feature, no integrations |
+| 45–60 s | homepage hero | `x-demo` with 2–3 features, integrations, closer |
+| 90 s | launch video | `t-decode` cold open → `x-demo` (4 features) → `ig-line` (a real metric) → `card-quote` (a real customer) → end card |
+| 10–16 s loop | landing-page loop, GIF | `x-journey` |
+| 2–5 min | tutorial / walkthrough | recording in `sr-zoom` per step, `mb-chapter` between steps, `ig-flow` overview at the top |
+
+Copy for explainers: one short line per beat (≤ 7 words), the product's own vocabulary, one highlighted phrase per
+line, no claims you can't source. UI content (prompts, file names, rows) believable and specific.
+
 ## Copy rules
 
 - Titles: 1–2 words, nouns or verbs ("Setup", "Done", "Light"). No full stops.

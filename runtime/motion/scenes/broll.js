@@ -11,10 +11,11 @@ import { barChart, lineChart } from '../charts.js';
 /** zoom so a w×h state fills the frame without overflowing (pref = the zoom you'd use at 16:9) */
 export const fitCam = (S, w, hh, pref) => { const R = S.__panel || { w: S.W, h: S.H }; return Math.min(pref, ((S.__panel ? 0.84 : 0.86) * R.w) / w, ((S.__panel ? 0.8 : 0.62) * R.h) / hh); };
 /** B-roll scene: with a panel centre, zooms fit the empty region around that centre, not the whole frame */
-const brollScene = (def) => defineScene({ ...def, build(ctx) { if (ctx.p.center) { const [cx, cy] = ctx.p.center; ctx.S.__panel = { w: 2 * Math.min(cx, ctx.W - cx), h: 2 * Math.min(cy, ctx.H - cy) }; } return def.build(ctx); } });
+// `center` is in output pixels; the renderer lays scenes out at the design size (short side 1080) and passes the ratio as __scale
+const brollScene = (def) => defineScene({ ...def, build(ctx) { if (ctx.p.center) { const [cx, cy] = centerOf(ctx); ctx.S.__panel = { w: 2 * Math.min(cx, ctx.W - cx), h: 2 * Math.min(cy, ctx.H - cy) }; } return def.build(ctx); } });
 const P = (S, n) => n * S.u;
 const common = { transparent: false, center: null, accent: null };
-const centerOf = (ctx) => ctx.p.center || [ctx.W / 2, ctx.H / 2];
+const centerOf = (ctx) => (ctx.p.center ? ctx.p.center.map((v) => v / (ctx.p.__scale || 1)) : [ctx.W / 2, ctx.H / 2]);
 /** absolutely positioned HTML snippet inside a layer */
 const put = (L, html, style = {}) => { const d = h('div', { html, style: { position: 'absolute', ...style } }); L.appendChild(d); return d; };
 const txt = (S, L, s, x, y, size, o = {}, extra = {}) => { const d = h('div', { text: s, style: { position: 'absolute', left: x + 'px', top: y + 'px', ...ts(S, size, o), ...extra } }); L.appendChild(d); return d; };

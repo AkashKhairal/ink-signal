@@ -77,6 +77,7 @@ section { padding-block: 56px 8px; }
 .comp[aria-pressed="true"] { border-left-color: var(--accent); background: var(--surface); }
 .stagebox { background: var(--stage); min-height: 320px; display: grid; place-items: center; padding: 16px; position: relative;
   background-image: repeating-conic-gradient(rgba(255,255,255,.035) 0 25%, transparent 0 50%); background-size: 24px 24px; }
+.mframe { display: block; width: 100%; height: 480px; border: 0; background: #141414; }
 .stagebox canvas { display: block; max-width: 100%; max-height: 72vh; width: auto; height: auto; box-shadow: 0 0 0 1px rgba(255,255,255,.08); }
 .stagemsg { position: absolute; inset: auto 16px 16px 16px; color: #ECEBE6; font: 500 12px/1.4 var(--f-mono); white-space: pre-wrap; }
 .panel { display: flex; flex-direction: column; gap: 16px; }
@@ -138,14 +139,14 @@ footer { padding-block: 48px; color: var(--muted); font-size: 13px; }
 <header class="top">
   <div class="wrap">
     <a class="mark" href="#player">Ink <span>&amp;</span> Signal</a>
-    <nav aria-label="Sections"><a href="#player">Player</a><a href="#tokens">Tokens</a><a href="#components">Components</a><a href="#pipeline">Pipeline</a><a href="#rules">Rules</a></nav>
+    <nav aria-label="Sections"><a href="#player">Player</a><a href="#motion">Motion</a><a href="#tokens">Tokens</a><a href="#components">Components</a><a href="#pipeline">Pipeline</a><a href="#rules">Rules</a></nav>
   </div>
 </header>
 
 <main class="wrap">
   <div class="hero">
     <div>
-      <div class="kicker"><span class="label">Motion library v2 · Reels &amp; YouTube · 2D + 3D</span></div>
+      <div class="kicker"><span class="label">Motion library v3 · Reels, YouTube &amp; explainers · 2D + 3D</span></div>
       <div class="sel"><h1>Ink &amp; Signal</h1><i></i><i></i><i></i><i></i><i></i><i></i></div>
     </div>
     <div>
@@ -186,6 +187,36 @@ footer { padding-block: 48px; color: var(--muted); font-size: 13px; }
         <div>
           <div class="label" style="margin-bottom: 6px">Render this</div>
           <div class="cmd"><pre id="cli"></pre><button class="btn ghost" type="button" id="copycli">Copy</button></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="motion" aria-label="Motion scenes">
+    <div class="sechead"><h2>Motion</h2><span class="label">runtime/motion · Signal Motion engine</span></div>
+    <p style="max-width: 70ch; color: var(--muted); margin: 0 0 20px">Explainers, motion B-roll, infographics, cards, kinetic titles and object transitions: springs, a camera, a cursor and the interface layer. Each one plays live below from <code>stage/motion.html</code>.</p>
+    <div class="player">
+      <div class="list" id="mlist" aria-label="Motion scenes"></div>
+      <div class="stagebox" style="padding: 0"><iframe class="mframe" id="mframe" title="Motion scene preview"></iframe></div>
+      <div class="panel">
+        <div><h3 id="mtitle">Hype promo</h3><p class="desc" id="mdesc"></p></div>
+        <div class="seg" role="group" aria-label="Format" id="mformats">
+          <button type="button" data-f="reel" aria-pressed="false">Reel</button>
+          <button type="button" data-f="yt" aria-pressed="true">YouTube</button>
+          <button type="button" data-f="square" aria-pressed="false">Square</button>
+        </div>
+        <div>
+          <label class="label" for="mparams">Params (JSON)</label>
+          <textarea id="mparams" spellcheck="false"></textarea>
+          <div class="transport" style="margin-top: 8px">
+            <button class="btn" type="button" id="mapply">Apply</button>
+            <button class="btn ghost" type="button" id="mreset">Reset</button>
+            <span class="err" id="mperr" role="status"></span>
+          </div>
+        </div>
+        <div>
+          <div class="label" style="margin-bottom: 6px">Render this</div>
+          <div class="cmd"><pre id="mcli"></pre><button class="btn ghost" type="button" id="mcopy">Copy</button></div>
         </div>
       </div>
     </div>
@@ -244,7 +275,7 @@ footer { padding-block: 48px; color: var(--muted); font-size: 13px; }
     <div class="rules"><div><h3 style="margin-bottom: 10px">Do</h3><ul id="do"></ul></div><div><h3 style="margin-bottom: 10px">Don't</h3><ul id="dont"></ul></div></div>
   </section>
 
-  <footer>Ink &amp; Signal v2 · fonts SIL OFL · three.js MIT · Visual language inspired by Raagav Sundar's Graphic Design Portfolio 2026 (Behance); no artwork from it is included.</footer>
+  <footer>Ink &amp; Signal v3 · fonts SIL OFL · icons Lucide ISC · sounds CC0 · motion vocabulary after Barty-Bart/motion-graphics (MIT) · three.js MIT · Visual language inspired by Raagav Sundar's Graphic Design Portfolio 2026 (Behance); no artwork from it is included.</footer>
 </main>
 
 <script type="importmap">
@@ -375,6 +406,40 @@ const tick = async (now) => {
 if (reduce) { playing = false; $('play').textContent = 'Play'; }
 select('chapter');
 requestAnimationFrame(tick);
+
+/* ───── motion scenes (iframe of stage/motion.html) ───── */
+try {
+  const { SCENES } = await import(ROOT + 'runtime/motion/scenes/index.js');
+  const MK = [['explainer', 'Explainers'], ['screen', 'Screen recordings'], ['broll', 'Motion B-roll'], ['infographic', 'Infographics'], ['card', 'Cards'], ['title', 'Kinetic titles'], ['transition', 'Transitions']];
+  const mlist = $('mlist');
+  for (const [kind, label] of MK) {
+    const items = Object.values(SCENES).filter((d) => d.kind === kind);
+    if (!items.length) continue;
+    const g = document.createElement('div'); g.className = 'group'; g.innerHTML = `<div class="label">${label}</div>`;
+    for (const d of items) { const b = document.createElement('button'); b.type = 'button'; b.className = 'comp mcomp'; b.dataset.name = d.name; b.setAttribute('aria-pressed', 'false'); b.innerHTML = `${d.title}<small>${d.name}</small>`; b.onclick = () => mselect(d.name); g.appendChild(b); }
+    mlist.appendChild(g);
+  }
+  let mcur = 'x-hype', mfmt = 'yt', mparams = null;
+  const medit = (d) => { const p = { ...d.defaults }; delete p.format; return p; };
+  const mload = () => {
+    const d = SCENES[mcur]; if (!d.formats.includes(mfmt)) mfmt = d.formats[0];
+    document.querySelectorAll('.mcomp').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.name === mcur)));
+    $('mtitle').textContent = d.title; $('mdesc').textContent = d.description;
+    document.querySelectorAll('#mformats button').forEach((b) => { b.disabled = !d.formats.includes(b.dataset.f); b.setAttribute('aria-pressed', String(b.dataset.f === mfmt)); });
+    const q = new URLSearchParams({ scene: mcur, format: mfmt }); if (mparams) q.set('params', JSON.stringify(mparams));
+    $('mframe').src = ROOT + 'stage/motion.html?' + q.toString(); mfit();
+    const pq = mparams ? ` \\\n  --params '${JSON.stringify(mparams)}'` : '';
+    $('mcli').textContent = `node render/cli.mjs render ${mcur} --format ${mfmt}${pq} --blur 4 --out ${mcur}.${d.transparent ? 'mov' : 'mp4'}`;
+  };
+  const mfit = () => { const f = $('mframe'), r = mfmt === 'reel' ? 16 / 9 : mfmt === 'square' ? 1 : 9 / 16; f.style.height = Math.round(Math.min(f.clientWidth * r + 56, innerHeight * 0.82)) + 'px'; };
+  addEventListener('resize', mfit);
+  const mselect = (n) => { mcur = n; mparams = null; $('mparams').value = JSON.stringify(medit(SCENES[n]), null, 1); $('mperr').textContent = ''; mload(); };
+  document.querySelectorAll('#mformats button').forEach((b) => b.addEventListener('click', () => { if (b.disabled) return; mfmt = b.dataset.f; mload(); }));
+  $('mapply').addEventListener('click', () => { try { mparams = JSON.parse($('mparams').value); $('mperr').textContent = ''; mload(); } catch (e) { $('mperr').textContent = 'That is not valid JSON: ' + e.message; } });
+  $('mreset').addEventListener('click', () => mselect(mcur));
+  $('mcopy').addEventListener('click', () => copy($('mcopy'), $('mcli').textContent));
+  mselect('x-hype');
+} catch (e) { $('mdesc').textContent = 'Motion scenes need the library served over http (node render/serve.mjs): ' + e.message; }
 </script>
 <!--IS:BODY-END-->
 </body>

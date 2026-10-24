@@ -155,9 +155,9 @@ export async function openStage(target, a) {
   const { chromium } = require('playwright');
   const srv = await startServer();
   const browser = await chromium.launch({ args: ['--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist', '--autoplay-policy=no-user-gesture-required'] });
-  const page = await browser.newPage({ viewport: { width: 1280, height: 1280 } });
-  page.on('console', (m) => { if (m.type() === 'error') console.error('[page]', m.text()); });
-  page.on('pageerror', (e) => console.error('[page]', e.message));
+  const listen = (pg) => { pg.on('console', (m) => { if (m.type() === 'error') console.error('[page]', m.text()); }); pg.on('pageerror', (e) => console.error('[page]', e.message)); return pg; };
+  let page = listen(await browser.newPage({ viewport: { width: 1280, height: 1280 } }));
+  let out = null; // motion scenes: requested output size + render scale
   // a bespoke page (e.g. a GSAP scene using runtime/gsap-bridge.js), a motion scene (DOM engine) or the standard stage
   let sq;
   if (target.endsWith('.html')) sq = { query: '', specFile: null, page: fsUrl(path.resolve(target)) };
@@ -167,11 +167,17 @@ export async function openStage(target, a) {
     const cache = path.resolve(a.cache || path.join(base, '.ink-signal-cache'));
     fs.mkdirSync(cache, { recursive: true });
     const p = await prepareMotionMedia(def, readParams(a), base, cache);
-    const pf = path.join(cache, `motion-${process.pid}-${Date.now()}.params.json`);
-    fs.writeFileSync(pf, JSON.stringify(p));
     const { resolveParams } = await import('../runtime/motion/scene.js');
     const fmt = (await import('../runtime/core.js')).T.format[resolveParams(def, p).format] || { width: 1080, height: 1920 };
-    await page.setViewportSize({ width: p.width || fmt.width, height: p.height || fmt.height });
+    // Scenes always lay out at the design size (short side 1080, S.u = 1); Chromium draws them at the requested
+    // resolution through deviceScaleFactor, so a 720p, 4K or GIF-sized render is the same picture, vector-sharp.
+    const W = +(p.width || fmt.width), H = +(p.height || fmt.height), k = Math.min(W, H) / 1080;
+    const dW = Math.round(W / k), dH = Math.round(H / k);
+    p.width = dW; p.height = dH; if (Math.abs(k - 1) > 1e-6) p.__scale = k; out = { W, H, k };
+    if (Math.abs(k - 1) > 1e-6) { await page.close(); page = listen(await browser.newPage({ viewport: { width: dW, height: dH }, deviceScaleFactor: k })); }
+    else await page.setViewportSize({ width: dW, height: dH });
+    const pf = path.join(cache, `motion-${process.pid}-${Date.now()}.params.json`);
+    fs.writeFileSync(pf, JSON.stringify(p));
     sq = { specFile: pf, page: `/stage/motion.html?scene=${encodeURIComponent(target)}&paramsUrl=${encodeURIComponent(fsUrl(pf))}&base=${encodeURIComponent(fsUrl(base) + '/')}&render=1` };
   } else sq = await stageQuery(target, a);
   await page.goto(sq.page ? `http://127.0.0.1:${srv.port}${sq.page}` : `http://127.0.0.1:${srv.port}/stage/index.html?${sq.query}`);
@@ -198,16 +204,18 @@ export async function openStage(target, a) {
     };
   });
   const meta = await page.evaluate(() => ({ width: IS.spec.width, height: IS.spec.height, fps: IS.spec.fps, duration: IS.spec.duration, name: IS.spec.name, background: IS.spec.background, markers: IS.spec.markers, dom: !!IS.dom, cues: IS.cues || [], post: IS.spec.post || {} }));
+  // motion scenes: the page is the design size, the frames are the requested size
+  if (out) Object.assign(meta, { clipW: meta.width, clipH: meta.height, width: out.W, height: out.H, scale: out.k });
   const alphaShot = !meta.background;
   /** DOM scenes: seek, then screenshot the stage. n > 1 → n subframes across the shutter (blended by ffmpeg) */
   const grabDom = async (f, n = 1, shutter = 0.5) => {
-    const out = [];
+    const shots = [];
     for (let i = 0; i < n; i++) {
       const ff = n <= 1 ? f : f - shutter / 2 + (shutter * (i + 0.5)) / n;
       await page.evaluate((x) => window.IS.seek(x), ff);
-      out.push(await page.screenshot({ clip: { x: 0, y: 0, width: meta.width, height: meta.height }, type: 'png', omitBackground: alphaShot }));
+      shots.push(await page.screenshot({ clip: { x: 0, y: 0, width: meta.clipW || meta.width, height: meta.clipH || meta.height }, type: 'png', omitBackground: alphaShot }));
     }
-    return out;
+    return shots;
   };
   /** one frame as PNG buffer(s): canvas stages blend subframes in the page, DOM stages return n subframes */
   const grab = async (f, n = 1) => (meta.dom ? grabDom(f, n) : [b64png(await page.evaluate(([fr, nn]) => window.__grab(fr, nn), [f, n]))]);
@@ -219,8 +227,10 @@ const b64png = (dataUrl) => Buffer.from(dataUrl.slice(dataUrl.indexOf(',') + 1),
 function ffmpegArgs(out, meta, a, sub = 1) {
   const ext = path.extname(out).toLowerCase();
   const alpha = a.alpha || (!meta.background && ext !== '.mp4');
-  const inp = ['-y', '-hide_banner', '-loglevel', 'error', '-f', 'image2pipe', '-framerate', String(meta.fps * sub), '-c:v', 'png', '-i', '-'];
+  // -reinit_filter 0: Chrome writes fully transparent frames as a different PNG type; a filtergraph re-init would reset tmix/select and drop frames
+  const inp = ['-y', '-hide_banner', '-loglevel', 'error', '-f', 'image2pipe', '-framerate', String(meta.fps * sub), '-c:v', 'png', '-reinit_filter', '0', '-i', '-'];
   const vf = [];
+  if (meta.scale && Math.abs(meta.scale - 1) > 1e-6) vf.push(`scale=${meta.width}:${meta.height}:flags=lanczos`); // exact size after the device-scale capture
   if (sub > 1) vf.push(`format=${alpha ? 'gbrap' : 'gbrp'},tmix=frames=${sub}:weights='${Array(sub).fill(1).join(' ')}',select='eq(mod(n\\,${sub})\\,${sub - 1})',setpts=N/(${meta.fps}*TB)`);
   // film grain for DOM scenes is added here (ffmpeg's noise is seeded → deterministic)
   if (meta.post && meta.post.grain && !alpha && !a['no-grain']) vf.push(`format=yuv444p,noise=c0s=${Math.round(meta.post.grain * 90)}:c0f=t,format=yuv420p`);

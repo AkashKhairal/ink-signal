@@ -93,3 +93,49 @@ advances come from `runtime/metrics.js` (no kerning, identical everywhere).
 | grain | adjustment layer + Noise | rendered |
 | three | `renders/pass_*.mov` (ProRes 4444) | rendered |
 | markers | comp markers | sequence / timeline markers |
+
+## v3 — Signal Motion layer
+
+The Signal Motion engine (`runtime/motion/`, guide in [`MOTION-ENGINE.md`](MOTION-ENGINE.md)) adds springs, a camera,
+a cursor and an **interface layer** to the brand. All values live in `tokens/ink-signal.tokens.json`.
+
+### Springs (`tokens.springs`, [ω rad/s, ζ])
+
+| spring | ω, ζ | use |
+|---|---|---|
+| `morph` | 15, .84 | the one shape changing size, radius and colour between states |
+| `fast` / `slow` | 27, .86 / 12.5, .9 | leading / trailing edge of a moving indicator (it stretches), items sliding under a highlight |
+| `soft` | 10, .95 | content moves, large panels, focus shifts |
+| `camera` | 7.5, 1 | push / pull / glide — never overshoots |
+| `pop` | 16, .7 | badges, chips, toasts |
+| `stamp` | 22, .6 | glyphs, checks, the punch of a slam — overshoot on small things only |
+| `settle` · `drop` | 14, .82 · 18, .72 | cards landing, dealt cards |
+
+A value that changes target many times is the sum of one closed-form spring per change, so any frame renders on its
+own (subframe motion blur, parallel renders, seamless loops).
+
+### Interface layer (`tokens.ui`)
+
+Product UI rebuilt in the brand: paper canvas (night: `#0B0B0C`), white surfaces with a 1.5 px rule border and a soft
+two-step shadow (night: raised panels with a hairline), Archivo for UI text, JetBrains Mono for code, numbers and file
+names, Lucide line icons at one stroke (`tokens.icon`), one accent. Radii only here: card 28 · panel 20 · tile 24 ·
+control 14 · chip 10 · pill. Brand devices (selection box, plates, tickers, HUD) stay square.
+
+### Motion rules (`tokens.motion`)
+
+| | value | rule |
+|---|---|---|
+| content swap | exit 0.07 s blur 12 px → entry 0.26 s from 94 % | text inside a morphing shape never cross-fades |
+| cursor | 44 px, arrives 0.3 s before a click, press 0.14 s to 86 %, ripple 0.55 s | constant on-screen size at every zoom, gentle arcs, never leaves the frame |
+| typing | 25 cps (40 fast), caret 2.2 Hz | the camera rides the caret in calm pieces |
+| reading | title hold 2 s, 0.5 s after a result, ≥ 0.6 s on screen, 3.2 words/s | |
+| camera | push 1.0 s · pull 0.9 s · glide 1.1 s · follow spring [6, 1] · tilt ≤ 22° | the camera is the editor in calm pieces: push into a line, ride the action, pull back to show where you are |
+| beat | big moves on beats, type on 1/16, cuts on downbeats | `beats(bpm, offset)` in the engine |
+| HUD frame | brackets, `SCENE nn / tt`, category, timecode with a red dot (`tokens.hudFrame`) | every scene of a hype piece |
+| charts | bars rise on `settle`, one accent bar/segment, values count linearly, tooltips `pop` (`tokens.chart`) | real numbers only |
+
+### Sound (`tokens.sound`)
+
+Cue types (`click appear movement scene_cut typing build_up reveal slam stamp success notify tick error`) map to
+categories of the bundled CC0 library with gains, pre-roll and minimum gaps; the mix targets −14 LUFS integrated and
+< −1.5 dBTP, measured on the exported file. Guide: [`SOUND.md`](SOUND.md).

@@ -125,7 +125,7 @@ export const igCompare = defineScene({
     const nt = h('div', { text: p.verdict, style: { position: 'absolute', ...fstyle(S, 'note', reel ? 80 : 72, { color: S.theme === 'night' ? '#FFFFFF' : T.color.pen }), transform: 'rotate(-4deg)' } }); S.front.appendChild(nt);
     ctx.add((t) => {
       cols.forEach(({ num, bar, c, cw, t0 }) => { const k = ease('snap')(seg(t, t0, t0 + 1.2)); setText(num, fmtNum(c.value * k, { suffix: c.unit || '' })); css(bar, { width: cw * (c.value / M) * Math.max(0, spr(t, t0, 'settle')) + 'px' }); });
-      if (win) css(nt, { left: win.cx + (reel ? win.cw * 0.5 : win.cw * 0.45) + 'px', top: win.cy + (reel ? 50 : 270) * u + 'px', clipPath: `inset(-30% ${(100 - 100 * ep(t, vT, vT + 0.6, 'write')).toFixed(1)}% -40% -5%)` });
+      if (win) css(nt, { left: win.cx + (reel ? win.cw * 0.42 : win.cw * 0.45) + 'px', top: win.cy + (reel ? 290 : 270) * u + 'px', clipPath: `inset(-30% ${(100 - 100 * ep(t, vT, vT + 0.6, 'write')).toFixed(1)}% -40% -5%)` });
     });
     cols.forEach((c) => ctx.cue(c.t0, 'count', 'count', { dur: 1.2 })); ctx.cue(vT, 'appear', 'verdict');
   },

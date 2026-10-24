@@ -131,7 +131,8 @@ export const xHype = defineScene({
     let three = null;
     ctx.ready.push((async () => {
       const kit = await import('../../three/kit.js'); const { THREE } = kit;
-      const r = kit.makeRenderer(W, H); cv.appendChild(r.domElement); css(r.domElement, { width: W + 'px', height: H + 'px' });
+      const dpr = Math.max(1, window.devicePixelRatio || 1); // 4K renders: draw the 3D at the output resolution
+      const r = kit.makeRenderer(Math.round(W * dpr), Math.round(H * dpr)); cv.appendChild(r.domElement); css(r.domElement, { width: W + 'px', height: H + 'px' });
       const scene = new THREE.Scene(); scene.fog = new THREE.Fog(C.night, 18, 46);
       const cam = new THREE.PerspectiveCamera(T.three.camera.fov, W / H, 0.1, 200);
       kit.lights(scene, { world: 'night', accent, radius: 30, shadowSize: 16 });
