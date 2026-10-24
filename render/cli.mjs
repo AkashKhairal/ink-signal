@@ -48,6 +48,7 @@ export async function prepareMotionMedia(def, p, base, cacheRoot) {
   const rp = resolveParams(def, p); const { fps } = sceneFrames(def, p);
   const seq = {};
   for (const m of def.media(rp) || []) {
+    if (m && m.dir) { const d = path.resolve(base, m.dir); if (!fs.existsSync(d)) throw new Error('Mask folder not found: ' + d); seq[m.key] = { dir: fsUrl(d), count: fs.readdirSync(d).filter((f) => f.endsWith('.png')).length, offset: m.start || 0 }; continue; }
     if (!m || !m.src) continue;
     const file = path.resolve(base, m.src);
     if (!fs.existsSync(file)) throw new Error('Footage not found: ' + file);
@@ -107,6 +108,26 @@ export function prepareFootage(spec, base, cacheRoot) {
   return spec;
 }
 
+/** motion scenes placed in an IS Spec (edit plans) are rendered once to PNG sequences (alpha) and played as footage */
+export async function prepareMotionLayers(spec, base, cacheRoot) {
+  const jobs = [];
+  const visit = (ls) => ls.forEach((L) => { if (L.type === 'footage' && L.motion) jobs.push(L); if (L.layers) visit(L.layers); });
+  visit(spec.layers);
+  for (const L of jobs) {
+    const { scene, params } = L.motion;
+    const key = Buffer.from(JSON.stringify([scene, params])).toString('base64url');
+    const h = [...key].reduce((a, ch) => ((a * 33) ^ ch.charCodeAt(0)) >>> 0, 5381).toString(36) + key.length.toString(36);
+    const dir = path.join(cacheRoot, `motion-${scene}-${h}`);
+    if (!fs.existsSync(path.join(dir, 'done'))) {
+      fs.mkdirSync(dir, { recursive: true });
+      await render(scene, { params: JSON.stringify(params), out: dir + '/', base, noMarkers: true, cache: cacheRoot });
+      fs.writeFileSync(path.join(dir, 'done'), '1');
+    }
+    L.seq = { dir: fsUrl(dir), count: fs.readdirSync(dir).filter((f) => f.endsWith('.png')).length, prefix: scene + '_', start: 0, ext: 'png' };
+  }
+  return spec;
+}
+
 /** drop animated grain (smaller GIFs / previews) */
 function stripGrain(layers) {
   return layers.filter((l) => !(l.type === 'texture' && l.kind === 'grain')).map((l) => (l.layers ? { ...l, layers: stripGrain(l.layers) } : l));
@@ -119,6 +140,7 @@ export async function stageQuery(target, a) {
   const cache = path.resolve(a.cache || path.join(base, '.ink-signal-cache'));
   prepareFootage(spec, base, cache);
   fs.mkdirSync(cache, { recursive: true });
+  await prepareMotionLayers(spec, base, cache);
   const specFile = path.join(cache, `stage-${process.pid}-${Date.now()}.spec.json`);
   fs.writeFileSync(specFile, JSON.stringify(spec));
   const q = new URLSearchParams();
@@ -175,7 +197,7 @@ export async function openStage(target, a) {
       return t.toDataURL('image/png');
     };
   });
-  const meta = await page.evaluate(() => ({ width: IS.spec.width, height: IS.spec.height, fps: IS.spec.fps, duration: IS.spec.duration, name: IS.spec.name, background: IS.spec.background, markers: IS.spec.markers, dom: !!IS.dom, cues: IS.cues || [] }));
+  const meta = await page.evaluate(() => ({ width: IS.spec.width, height: IS.spec.height, fps: IS.spec.fps, duration: IS.spec.duration, name: IS.spec.name, background: IS.spec.background, markers: IS.spec.markers, dom: !!IS.dom, cues: IS.cues || [], post: IS.spec.post || {} }));
   const alphaShot = !meta.background;
   /** DOM scenes: seek, then screenshot the stage. n > 1 → n subframes across the shutter (blended by ffmpeg) */
   const grabDom = async (f, n = 1, shutter = 0.5) => {
@@ -198,7 +220,12 @@ function ffmpegArgs(out, meta, a, sub = 1) {
   const ext = path.extname(out).toLowerCase();
   const alpha = a.alpha || (!meta.background && ext !== '.mp4');
   const inp = ['-y', '-hide_banner', '-loglevel', 'error', '-f', 'image2pipe', '-framerate', String(meta.fps * sub), '-c:v', 'png', '-i', '-'];
-  if (sub > 1) inp.push('-vf', `format=${alpha ? 'gbrap' : 'gbrp'},tmix=frames=${sub}:weights='${Array(sub).fill(1).join(' ')}',select='eq(mod(n\\,${sub})\\,${sub - 1})',setpts=N/(${meta.fps}*TB)`, '-r', String(meta.fps));
+  const vf = [];
+  if (sub > 1) vf.push(`format=${alpha ? 'gbrap' : 'gbrp'},tmix=frames=${sub}:weights='${Array(sub).fill(1).join(' ')}',select='eq(mod(n\\,${sub})\\,${sub - 1})',setpts=N/(${meta.fps}*TB)`);
+  // film grain for DOM scenes is added here (ffmpeg's noise is seeded → deterministic)
+  if (meta.post && meta.post.grain && !alpha && !a['no-grain']) vf.push(`format=yuv444p,noise=c0s=${Math.round(meta.post.grain * 90)}:c0f=t,format=yuv420p`);
+  if (vf.length) inp.push('-vf', vf.join(','));
+  if (sub > 1) inp.push('-r', String(meta.fps));
   if (out.endsWith('/') || path.extname(out) === '') return [...inp, '-f', 'image2', path.join(out, `${meta.name}_%05d.png`)];
   if (ext === '.mov') return [...inp, '-c:v', 'prores_ks', '-profile:v', alpha ? '4444' : '3', '-pix_fmt', alpha ? 'yuva444p10le' : 'yuv422p10le', '-vendor', 'apl0', out];
   if (ext === '.webm') return [...inp, '-c:v', 'libvpx-vp9', '-pix_fmt', alpha ? 'yuva420p' : 'yuv420p', '-b:v', '0', '-crf', '24', '-auto-alt-ref', '0', out];

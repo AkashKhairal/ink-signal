@@ -97,6 +97,16 @@ export function highlight(S, wordEl, { at = 0, dur = T.motion.highlight.sweep, c
   };
 }
 
+/** inline highlight that wraps across lines (background sweep on an inline span) */
+export function highlightInline(el, { at = 0, dur = T.motion.highlight.sweep, color = 'var(--accent)', textOn = T.color.ink, out = null } = {}) {
+  css(el, { backgroundImage: `linear-gradient(${color},${color})`, backgroundRepeat: 'no-repeat', backgroundPosition: '0 55%', WebkitBoxDecorationBreak: 'clone', boxDecorationBreak: 'clone', padding: '0 0.1em', margin: '0 -0.1em' });
+  const base = el.style.color || '';
+  return (t) => {
+    const p = ease('wipe')(seg(t, at, at + dur)) * (out != null ? 1 - ease('exit')(seg(t, out, out + dur * 0.8)) : 1);
+    css(el, { backgroundSize: `${(p * 100).toFixed(2)}% 92%`, color: p > 0.55 ? textOn : base });
+  };
+}
+
 /**
  * rotator(S, parent, { x, y, anchor, words, times, font, size, ...fstyle }) — slot that cycles words:
  * old word lifts out with blur, new word rises in. Returns { el, update(t), width }.

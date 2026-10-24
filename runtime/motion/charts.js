@@ -182,9 +182,9 @@ export function ranking(S, parent, { x = 0, y = 0, w = 900, anchor = 'tl', label
   const M = max ?? Math.max(...frames.flatMap(([, f]) => Object.values(f)));
   const rows = labels.map((l, i) => {
     const r = h('div', { style: { position: 'absolute', left: '0px', width: W + 'px', height: RH + 'px' } });
-    const lab = h('div', { text: l, style: { position: 'absolute', left: '0px', width: LW - px(S, 20) + 'px', top: '50%', transform: 'translateY(-50%)', textAlign: 'right', ...ts(S, 'small', { label: true, color: l === accent ? 'var(--accent)' : 'var(--ui-text)' }) } });
+    const lab = h('div', { text: l, style: { position: 'absolute', left: '0px', width: LW - px(S, 20) + 'px', top: '50%', transform: 'translateY(-50%)', textAlign: 'right', ...ts(S, 24, { label: true, color: l === accent ? 'var(--accent)' : 'var(--ui-text)' }) } });
     const bar = h('div', { style: { position: 'absolute', left: LW + 'px', top: RH * 0.2 + 'px', height: RH * 0.6 + 'px', borderRadius: `0 ${px(S, 6)}px ${px(S, 6)}px 0`, background: l === accent ? 'var(--accent)' : baseCol(S) } });
-    const val = h('div', { style: { position: 'absolute', top: '50%', transform: 'translateY(-50%)', ...ts(S, 'small', { mono: true }) } });
+    const val = h('div', { style: { position: 'absolute', top: '50%', transform: 'translateY(-50%)', ...ts(S, 26, { mono: true }) } });
     r.append(lab, bar, val); el.appendChild(r);
     const vt = track(0, frames.map(([t, f]) => [t, f[l] ?? 0, 'settle']));
     const order = track(i, frames.map(([t, f]) => { const sorted = [...labels].sort((a, b) => (f[b] ?? 0) - (f[a] ?? 0)); return [t, sorted.indexOf(l), 'soft']; }));

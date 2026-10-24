@@ -34,7 +34,7 @@ export class Camera {
  * createStage(root, { W, H, theme: 'paper'|'night', bg: token|css|null (transparent), grid: 'line'|'dot'|null, gridSize, accent })
  * Layers (bottom → top): back (screen space) · tilt › world (camera) · front (screen space) · cursor
  */
-export function createStage(root, { W, H, theme = 'paper', bg = 'canvas', grid = null, gridSize, accent = C.signal } = {}) {
+export function createStage(root, { W, H, theme = 'paper', bg = 'canvas', grid = null, gridSize, accent = C.signal, render = false } = {}) {
   const u = Math.min(W, H) / 1080;
   const ui = T.ui[theme];
   const bgColor = bg === null ? 'transparent' : col(bg === 'canvas' ? ui.canvas : bg, accent);
@@ -54,7 +54,7 @@ export function createStage(root, { W, H, theme = 'paper', bg = 'canvas', grid =
   const top = h('div', { class: 'is-top', style: { ...abs, width: W + 'px', height: H + 'px', pointerEvents: 'none' } });
   tilt.appendChild(world);
   root.append(back, tilt, front, top);
-  const stage = { root, back, tilt, world, front, top, W, H, u, theme, ui, accent, bgColor, transparent: bg === null };
+  const stage = { root, back, tilt, world, front, top, W, H, u, theme, ui, accent, bgColor, transparent: bg === null, render, post: {} };
   stage.cam = new Camera(stage);
   stage.cam.apply();
   if (grid) stage.grid = worldGrid(stage, { kind: grid, size: gridSize });

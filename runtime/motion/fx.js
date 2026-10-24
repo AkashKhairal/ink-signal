@@ -48,6 +48,8 @@ export function hudFrame(S, { scenes = [[0, 1, 'SIGNAL']], total = 6, at = 0, tl
 /* ═════════ grain & vignette ═════════ */
 /** film grain: seeded tiles generated once, cycled per frame (deterministic) */
 export function grain(S, { amount = T.footage.grain.amount, seed = 7, fps = 30, layer = null, tiles = 6 } = {}) {
+  // when rendering, grain is added by ffmpeg after capture (deterministic, and far faster than screenshotting noise)
+  if (S.render) { S.post.grain = amount; return { el: null, update() {} }; }
   const TS = 256, r = rng(seed);
   const pats = [];
   const cv = h('canvas', { width: Math.ceil(S.W / 2), height: Math.ceil(S.H / 2), style: { ...full(S), mixBlendMode: 'overlay', opacity: String(amount * 2.2), imageRendering: 'pixelated' } });

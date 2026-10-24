@@ -2,6 +2,8 @@
 // One plan → one IS Spec → rendered in the browser, or rebuilt as a timeline in Premiere / Resolve / AE.
 import { Comp } from '../spec.js';
 import { T } from '../core.js';
+import { SCENES as MOTION } from '../motion/scenes/index.js';
+import { sceneFrames } from '../motion/scene.js';
 
 /*
 plan = {
@@ -37,6 +39,7 @@ export function makeEdit(registry) {
       const durs = items.map((it) => {
         if (it.type === 'clip') return (it.out ?? (it.in || 0) + 3) - (it.in || 0);
         if (it.duration) return it.duration;
+        if (!registry[it.comp] && MOTION[it.comp]) { const q = sceneFrames(MOTION[it.comp], { ...(it.params || {}), format: fmt }); return q.frames / q.fps; }
         const def = registry[it.comp];
         const probe = def.build({ ...def.defaults, ...(it.params || {}), format: fmt }).toJSON();
         return probe.duration / probe.fps;
@@ -68,6 +71,15 @@ export function makeEdit(registry) {
           });
           tl.push({ track: 'V1', kind: 'clip', id: `clip${idx}`, src: it.src, srcIn: it.in || 0, start: s, end: e, audio: it.audio !== false, look: it.look || 'aroll' });
           for (const [oi, ov] of (it.overlays || []).entries()) {
+            if (!registry[ov.comp] && MOTION[ov.comp]) {
+              const at = s + Math.round((ov.at || 0) * fps);
+              const params = { transparent: true, ...(ov.params || {}), format: fmt, ...(plan.accent ? { accent: plan.accent } : {}) };
+              const q = sceneFrames(MOTION[ov.comp], params); const oe = Math.min(e, at + Math.round((q.frames / q.fps) * fps));
+              const id = `clip${idx}_ov${oi}`;
+              c.group({ id, size: [c.W, c.H], in: at, out: oe, comp: ov.comp }, () => { c.add('footage', { id: id + '/motion', motion: { scene: ov.comp, params, render: id + '.mov' }, size: [c.W, c.H], fit: 'cover', in: at, out: oe }); });
+              tl.push({ track: 'V2', kind: 'overlay', motion: true, id, comp: ov.comp, params, start: at, end: oe });
+              continue;
+            }
             const def = registry[ov.comp];
             const at = s + Math.round((ov.at || 0) * fps);
             const child = def.build({ ...def.defaults, ...(ov.params || {}), format: fmt, accent: plan.accent }).toJSON();
@@ -75,6 +87,14 @@ export function makeEdit(registry) {
             c.include(child, { at, id: `clip${idx}_ov${oi}`, out: oe });
             tl.push({ track: 'V2', kind: 'overlay', id: `clip${idx}_ov${oi}`, comp: ov.comp, params: { ...(ov.params || {}), format: fmt, accent: plan.accent }, start: at, end: oe });
           }
+        } else if (!registry[it.comp] && MOTION[it.comp]) {
+          // a motion scene (DOM engine): rendered to a frame sequence by the CLI and placed as footage
+          const id = `${it.comp}${idx}`;
+          const params = { ...(it.params || {}), format: fmt, ...(plan.accent ? { accent: plan.accent } : {}) };
+          c.group({ id, size: [c.W, c.H], in: s, out: e, comp: it.comp }, () => {
+            c.add('footage', { id: id + '/motion', motion: { scene: it.comp, params, render: id + '.mov' }, size: [c.W, c.H], fit: 'cover', in: s, out: e });
+          });
+          tl.push({ track: 'V1', kind: 'comp', motion: true, id, comp: it.comp, params, start: s, end: e });
         } else {
           const def = registry[it.comp];
           if (!def) throw new Error(`Unknown comp "${it.comp}"`);
@@ -89,6 +109,15 @@ export function makeEdit(registry) {
       placed.forEach(({ it, transitionAfter }) => {
         if (transitionAfter < 0 || transitionAfter >= ends.length - 1) return;
         const cut = ends[transitionAfter];
+        if (!registry[it.comp] && MOTION[it.comp]) {
+          const params = { ...(it.params || {}), format: fmt, ...(plan.accent ? { accent: plan.accent } : {}) };
+          const def = MOTION[it.comp]; const q = sceneFrames(def, params);
+          const cover = Math.round(((q.p.cover ?? 0) * fps));
+          const id = `tr${transitionAfter}_${it.comp}`, st = cut - cover, en = st + Math.round((q.frames / q.fps) * fps);
+          c.group({ id, size: [c.W, c.H], in: st, out: en, comp: it.comp }, () => { c.add('footage', { id: id + '/motion', motion: { scene: it.comp, params, render: id + '.mov' }, size: [c.W, c.H], fit: 'cover', in: st, out: en }); });
+          tl.push({ track: 'V3', kind: 'transition', motion: true, id, comp: it.comp, params, start: st, end: en, cut });
+          return;
+        }
         const def = registry[it.comp];
         const child = def.build({ ...def.defaults, ...(it.params || {}), format: fmt, accent: plan.accent }).toJSON();
         const cover = (child.markers.find((m) => /CUT/.test(m.label)) || { frame: 0 }).frame;

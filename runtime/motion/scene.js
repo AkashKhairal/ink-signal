@@ -36,7 +36,7 @@ export function mountScene(root, def, params = {}) {
   const theme = p.theme || def.theme || 'paper';
   const transparent = p.transparent ?? def.transparent ?? false;
   const accent = (typeof p.accent === 'string' && /^#[0-9a-f]{6}$/i.test(p.accent) ? p.accent : T.color.signal).toUpperCase();
-  const S = createStage(root, { W, H, theme, bg: transparent ? null : p.bg || 'canvas', grid: p.grid === undefined ? def.grid ?? null : p.grid, accent });
+  const S = createStage(root, { W, H, theme, bg: transparent ? null : p.bg || 'canvas', grid: p.grid === undefined ? def.grid ?? null : p.grid, accent, render: !!p.__render });
   const ups = [], late = [], cues = [], markers = [], ready = [], after = [];
   const duration = def.duration(p);
   const ctx = {
@@ -58,7 +58,7 @@ export function mountScene(root, def, params = {}) {
   const main = def.build(ctx);
   if (typeof main === 'function') ups.unshift(main);
   const frames = Math.round(duration * fps);
-  const meta = { spec: 'ink-signal/motion', name: def.name, scene: def.name, format: p.format, width: W, height: H, fps, duration: frames, background: transparent ? null : S.bgColor, markers, params: p, dom: true };
+  const meta = { spec: 'ink-signal/motion', name: def.name, scene: def.name, format: p.format, width: W, height: H, fps, duration: frames, background: transparent ? null : S.bgColor, markers, params: p, dom: true, post: S.post };
   cues.sort((a, b) => a.t - b.t);
   const seek = (f) => {
     let t = f / fps;

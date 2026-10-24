@@ -46,7 +46,8 @@ export async function buildPackage(planPath, a = {}) {
       item.file = file; item.alpha = alpha; item.srcInFrames = 0;
       if (!a['skip-renders']) {
         const params = { ...it.params };
-        if (it.kind === 'comp') params.duration = it.end - it.start;
+        if (it.kind === 'comp' && !it.motion) params.duration = it.end - it.start;
+        if (it.motion && it.kind !== 'comp') params.transparent = true;
         await render(it.comp, { params: JSON.stringify(params), out: file, alpha, blur: a.blur, base: planDir, noMarkers: true });
       }
       item.sourceFrames = it.kind === 'comp' ? it.end - it.start : it.end - it.start;
@@ -69,7 +70,7 @@ export async function buildPackage(planPath, a = {}) {
   const pdir = path.join(out, 'plates');
   fs.mkdirSync(pdir, { recursive: true });
   const plateLayers = [];
-  const walkP = (ls) => ls.forEach((l) => { if ((l.type === 'texture' && l.kind !== 'grain') || (l.type === 'footage' && !l.src)) plateLayers.push(l); if (l.layers) walkP(l.layers); });
+  const walkP = (ls) => ls.forEach((l) => { if ((l.type === 'texture' && l.kind !== 'grain') || (l.type === 'footage' && !l.src && !l.motion)) plateLayers.push(l); if (l.layers) walkP(l.layers); });
   walkP(spec.layers);
   if (!a['skip-renders']) {
     for (const l of plateLayers) {

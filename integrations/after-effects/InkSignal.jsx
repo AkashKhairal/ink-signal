@@ -277,6 +277,8 @@ var InkSignal = (function () {
     var pre = newComp(L.id, sz[0], sz[1], comp.duration, comp.frameRate);
     var item = L.src ? importFile(ctx.base ? ctx.base + '/' + L.src : L.src) : null;
     if (!item && L.src) item = importFile(L.src);
+    // motion scenes (Signal Motion engine) come pre-rendered in the package: renders/<item id>.mov
+    if (!item && L.motion && ctx.passesDir) item = importFile(ctx.passesDir + '/' + L.motion.render);
     var lay;
     if (item) {
       lay = pre.layers.add(item);
@@ -284,6 +286,7 @@ var InkSignal = (function () {
       lay.property('ADBE Transform Group').property('ADBE Scale').setValue([s, s, 100]);
       lay.property('ADBE Transform Group').property('ADBE Position').setValue([sz[0] / 2, sz[1] / 2]);
       lay.startTime = L['in'] / ctx.fps - (L.srcIn || 0);
+      if (L.motion) { lay.property('ADBE Transform Group').property('ADBE Scale').setValue([100, 100, 100]); }
       var fx = lay.property('ADBE Effect Parade');
       try { if (L.blur) { var gb = fx.addProperty('ADBE Gaussian Blur 2'); gb.property(1).setValue(L.blur); gb.property(3).setValue(1); } } catch (e1) {}
       try { if (L.exposure) fx.addProperty('ADBE Exposure2').property(3).setValue(L.exposure); } catch (e2) {}

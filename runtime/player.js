@@ -87,7 +87,7 @@ export async function boot({ canvas, root = '../', comp, params = {}, spec, base
   r2d.spec = spec;
   const seqCache = new Map();
   const seqFrame = (L, i) => {
-    const url = `${L.seq.dir}/${String(i + 1).padStart(5, '0')}.jpg`;
+    const url = `${L.seq.dir}/${L.seq.prefix || ''}${String(i + (L.seq.start ?? 1)).padStart(5, '0')}.${L.seq.ext || 'jpg'}`;
     if (!seqCache.has(url)) { const img = new Image(); img.src = url; seqCache.set(url, img.decode().then(() => img)); if (seqCache.size > 240) seqCache.delete(seqCache.keys().next().value); }
     return seqCache.get(url);
   };

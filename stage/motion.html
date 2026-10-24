@@ -36,6 +36,7 @@ try {
   if (q.get('paramsUrl')) params = { ...(await (await fetch(q.get('paramsUrl'))).json()), ...params };
   if (q.get('format')) params.format = q.get('format');
   if (q.get('base')) params.__base = q.get('base');
+  if (q.has('render')) params.__render = true;
   await Promise.all([...document.fonts].map((f) => f.load().catch(() => {})));
   await document.fonts.ready;
   const stage = document.getElementById('stage');

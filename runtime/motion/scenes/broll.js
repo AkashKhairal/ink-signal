@@ -9,7 +9,9 @@ import { ts, segmented, toggle, steps as stepsUI, skeleton, slider as sliderUI, 
 import { barChart, lineChart } from '../charts.js';
 
 /** zoom so a w×h state fills the frame without overflowing (pref = the zoom you'd use at 16:9) */
-export const fitCam = (S, w, hh, pref) => Math.min(pref, (0.86 * S.W) / w, (0.62 * S.H) / hh);
+export const fitCam = (S, w, hh, pref) => { const R = S.__panel || { w: S.W, h: S.H }; return Math.min(pref, ((S.__panel ? 0.84 : 0.86) * R.w) / w, ((S.__panel ? 0.8 : 0.62) * R.h) / hh); };
+/** B-roll scene: with a panel centre, zooms fit the empty region around that centre, not the whole frame */
+const brollScene = (def) => defineScene({ ...def, build(ctx) { if (ctx.p.center) { const [cx, cy] = ctx.p.center; ctx.S.__panel = { w: 2 * Math.min(cx, ctx.W - cx), h: 2 * Math.min(cy, ctx.H - cy) }; } return def.build(ctx); } });
 const P = (S, n) => n * S.u;
 const common = { transparent: false, center: null, accent: null };
 const centerOf = (ctx) => ctx.p.center || [ctx.W / 2, ctx.H / 2];
@@ -18,7 +20,7 @@ const put = (L, html, style = {}) => { const d = h('div', { html, style: { posit
 const txt = (S, L, s, x, y, size, o = {}, extra = {}) => { const d = h('div', { text: s, style: { position: 'absolute', left: x + 'px', top: y + 'px', ...ts(S, size, o), ...extra } }); L.appendChild(d); return d; };
 
 /* ───────── mb-launch: pill → card → option picker ───────── */
-export const mbLaunch = defineScene({
+export const mbLaunch = brollScene({
   name: 'mb-launch', kind: 'broll', title: 'Launch: pill → card → picker',
   description: 'A dark pill with the name and a New badge morphs into a white card about it, then into a segmented picker the cursor clicks through.',
   formats: ['yt', 'reel', 'square'],
@@ -61,7 +63,7 @@ export const mbLaunch = defineScene({
 });
 
 /* ───────── mb-terminal: folder → terminal (typing) → agent steps ───────── */
-export const mbTerminal = defineScene({
+export const mbTerminal = brollScene({
   name: 'mb-terminal', kind: 'broll', title: 'Folder → terminal → agent steps',
   description: 'A folder is double-clicked open into a terminal, a prompt types out, the agent starts, the shape becomes a checklist that ticks off on words.',
   formats: ['yt', 'reel', 'square'],
@@ -121,7 +123,7 @@ export const mbTerminal = defineScene({
 });
 
 /* ───────── mb-doc: notes → document → file chip dragged into a session ───────── */
-export const mbDoc = defineScene({
+export const mbDoc = brollScene({
   name: 'mb-doc', kind: 'broll', title: 'Notes → document → drag into a session',
   description: 'A notes card fills section by section on words, becomes a document that writes itself, shrinks to a file chip the cursor drags into a session pill.',
   formats: ['yt', 'reel', 'square'],
@@ -188,7 +190,7 @@ export const mbDoc = defineScene({
 const hexA = (hx) => [1, 3, 5].map((i) => parseInt(hx.slice(i, i + 2), 16)).join(',');
 
 /* ───────── mb-slider: drag a value, things build as it crosses thresholds ───────── */
-export const mbSlider = defineScene({
+export const mbSlider = brollScene({
   name: 'mb-slider', kind: 'broll', title: 'Slider builds a result',
   description: 'A card with a slider: the cursor drags it from low to high and a row of tiles lights up as the value crosses each threshold, with a live tooltip.',
   formats: ['yt', 'reel', 'square'],
@@ -222,7 +224,7 @@ export const mbSlider = defineScene({
 });
 
 /* ───────── mb-versus: A vs B with relative bars ───────── */
-export const mbVersus = defineScene({
+export const mbVersus = brollScene({
   name: 'mb-versus', kind: 'broll', title: 'Side-by-side comparison',
   description: 'A pill names the setup, then morphs into an A vs B card: each side gets a relative bar on its word, the badge flips to the verdict.',
   formats: ['yt', 'reel', 'square'],
@@ -252,7 +254,7 @@ export const mbVersus = defineScene({
 });
 
 /* ───────── mb-checklist: a card of tasks ticking off on words ───────── */
-export const mbChecklist = defineScene({
+export const mbChecklist = brollScene({
   name: 'mb-checklist', kind: 'broll', title: 'Checklist ticks off',
   description: 'A titled card where each task appears with a spinner and turns into a check on its word; ends on a confirmation chip.',
   formats: ['yt', 'reel', 'square'],
@@ -273,7 +275,7 @@ export const mbChecklist = defineScene({
 });
 
 /* ───────── mb-search: type a query, list filters, pick a result ───────── */
-export const mbSearch = defineScene({
+export const mbSearch = brollScene({
   name: 'mb-search', kind: 'broll', title: 'Search → filter → pick',
   description: 'A search pill types a query, opens into a results card that filters as it types, the highlight lands on a row and the cursor picks it.',
   formats: ['yt', 'reel', 'square'],
@@ -306,7 +308,7 @@ export const mbSearch = defineScene({
 });
 
 /* ───────── mb-chart: a chart card that grows on words ───────── */
-export const mbChart = defineScene({
+export const mbChart = brollScene({
   name: 'mb-chart', kind: 'broll', title: 'Chart card',
   description: 'A card with a bar chart (or line chart) whose bars rise on their words, one accent bar, then a tooltip on the point that matters. Relative values unless you pass real ones.',
   formats: ['yt', 'reel', 'square'],
@@ -334,7 +336,7 @@ export const mbChart = defineScene({
 });
 
 /* ───────── mb-chapter: "Up next" pill → chapter card ───────── */
-export const mbChapter = defineScene({
+export const mbChapter = brollScene({
   name: 'mb-chapter', kind: 'broll', title: 'Chapter card',
   description: 'A small “Up next →” pill grows into an ink chapter card: the number in the accent, the title, a muted subtitle.',
   formats: ['yt', 'reel', 'square'],
@@ -354,7 +356,7 @@ export const mbChapter = defineScene({
 });
 
 /* ───────── mb-drop: drag a file onto a drop zone → upload → done ───────── */
-export const mbDrop = defineScene({
+export const mbDrop = brollScene({
   name: 'mb-drop', kind: 'broll', title: 'File drag → drop → upload',
   description: 'A file tile is dragged by the cursor onto a dashed drop zone, the zone accepts it, morphs into an upload bar that fills and checks.',
   formats: ['yt', 'reel', 'square'],
@@ -389,7 +391,7 @@ export const mbDrop = defineScene({
 });
 
 /* ───────── mb-toggles: a settings card, toggles flip on words ───────── */
-export const mbToggles = defineScene({
+export const mbToggles = brollScene({
   name: 'mb-toggles', kind: 'broll', title: 'Settings toggles',
   description: 'A settings card with labelled toggles; the cursor flips each one on its word, the last one turns on a highlighted feature.',
   formats: ['yt', 'reel', 'square'],
