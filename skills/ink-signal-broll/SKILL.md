@@ -27,7 +27,8 @@ python3 tools/words.py talk.srt --out work/words.json  # word estimates (±0.2 s
 
 Table: `# | in–out | the line | what the shape does, on which words | treatment | why`. Treatment per clip:
 full-frame cutaway (3–10 s, a line about something to see; not in the hook's first second, not on personal lines,
-≥ 2 s of face between), transparent panel (`"kind": "panel"`, `"center"` in the empty area of a PiP section), or nothing.
+≥ 2 s of face between), transparent panel (`"kind": "panel"`, `"center"` = `[x, y]` in the video's pixels, in the empty area of a PiP section —
+`video.json` suggests `panel_center`), or nothing. Clips render at the video's resolution and frame rate.
 Map ideas to the vocabulary: `mb-launch` (pill → card → picker), `mb-terminal`, `mb-doc`, `mb-slider`, `mb-versus`,
 `mb-checklist`, `mb-search`, `mb-chart`, `mb-chapter`, `mb-drop`, `mb-toggles` — params in `docs/CATALOG.md`.
 Never invent numbers, quotes, prices or results; list what is illustrative in `notes`.
