@@ -1,0 +1,68 @@
+{
+ "name": "ink-signal-demo",
+ "format": "reel",
+ "fps": 30,
+ "timeline": [
+  {
+   "type": "comp",
+   "comp": "hook",
+   "duration": 4.2,
+   "params": {
+    "polaroids": []
+   }
+  },
+  {
+   "type": "transition",
+   "comp": "tr-torn",
+   "params": {
+    "color": "ink"
+   }
+  },
+  {
+   "type": "comp",
+   "comp": "chapter",
+   "duration": 3.2
+  },
+  {
+   "type": "transition",
+   "comp": "tr-flash"
+  },
+  {
+   "type": "comp",
+   "comp": "talking",
+   "duration": 5
+  },
+  {
+   "type": "transition",
+   "comp": "tr-paper-roll",
+   "params": {
+    "title": "Chapter 03",
+    "sub": "in 3D",
+    "hold": 8
+   }
+  },
+  {
+   "type": "comp",
+   "comp": "3d-title",
+   "duration": 3.4,
+   "params": {
+    "text": "Done"
+   }
+  },
+  {
+   "type": "transition",
+   "comp": "tr-ticker",
+   "params": {
+    "items": [
+     "See",
+     "Ya"
+    ]
+   }
+  },
+  {
+   "type": "comp",
+   "comp": "endcard",
+   "duration": 4
+  }
+ ]
+}

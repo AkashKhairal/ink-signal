@@ -1,0 +1,29 @@
+{
+  "name": "desk-setup-reel",
+  "format": "reel",
+  "fps": 30,
+  "accent": "#F2362B",
+  "audio": { "music": "music/track.mp3", "musicGainDb": -9, "lufs": -14 },
+  "snap": "downbeat",
+  "timeline": [
+    { "type": "comp", "comp": "hook", "duration": 3.0,
+      "params": { "word": "Hell", "note": "yep, that's me", "name": "[Your Name]", "line": "My desk setup, rebuilt in 30 days.", "polaroids": [] } },
+    { "type": "transition", "comp": "tr-torn", "params": { "color": "ink" } },
+    { "type": "clip", "src": "clips/talk_01.mp4", "in": 2.0, "out": 6.0, "look": "aroll",
+      "overlays": [
+        { "comp": "ov-chip", "at": 0.2, "params": { "text": "Step 01", "accentText": "/ 03" } },
+        { "comp": "ov-captions", "at": 0, "params": { "words": [
+          { "text": "First", "start": 0.1, "end": 0.45 }, { "text": "fix", "start": 0.45, "end": 0.7 },
+          { "text": "the", "start": 0.7, "end": 0.85 }, { "text": "light.", "start": 0.85, "end": 1.5 } ] } }
+      ] },
+    { "type": "comp", "comp": "chapter", "duration": 2.4,
+      "params": { "chapter": "Chapter 02", "title": "Light", "sub": "Key · Fill · Rim", "src": "clips/broll_lamp.mp4" } },
+    { "type": "transition", "comp": "tr-flash" },
+    { "type": "clip", "src": "clips/broll_desk.mp4", "in": 0.0, "out": 3.0, "look": "behindTitles",
+      "overlays": [ { "comp": "ov-callout", "at": 0.3, "params": { "x": 260, "y": 640, "w": 520, "h": 400, "tag": "OBJECT 01 · KEY LIGHT", "note": "this changed everything" } } ] },
+    { "type": "transition", "comp": "tr-paper-roll", "params": { "title": "Chapter 03", "sub": "the result", "hold": 8 } },
+    { "type": "comp", "comp": "3d-title", "duration": 2.6, "params": { "text": "Done" } },
+    { "type": "transition", "comp": "tr-ticker", "params": { "items": ["See", "Ya"] } },
+    { "type": "comp", "comp": "endcard", "duration": 3.0, "params": { "handle": "@yourhandle", "cta": "Follow for part 2" } }
+  ]
+}

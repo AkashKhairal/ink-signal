@@ -1,0 +1,19 @@
+{
+  "name": "ink-signal",
+  "version": "2.0.0",
+  "description": "Ink & Signal motion design library: deterministic 2D + 3D motion graphics for Reels and YouTube, with After Effects, Premiere Pro and DaVinci Resolve adapters.",
+  "type": "module",
+  "license": "MIT",
+  "scripts": {
+    "build": "python3 tools/build.py",
+    "list": "node render/cli.mjs list",
+    "spec": "node render/cli.mjs spec",
+    "render": "node render/cli.mjs render",
+    "still": "node render/cli.mjs still",
+    "reel": "node render/build-reel.mjs",
+    "preview": "node render/serve.mjs"
+  },
+  "dependencies": {
+    "playwright": "^1.47.0"
+  }
+}

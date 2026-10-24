@@ -1,0 +1,381 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<!--IS:HEAD-END-->
+<title>Ink &amp; Signal Library</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="is-root" content="../">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=Caveat:wght@600;700&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+/* Layout: a live stage first (list · stage · controls), then the system as reference sheets on graph paper. */
+:root {
+  --bg: #ECEBE6; --surface: #F4F3EF; --fg: #0E0E0E; --muted: #55544F; --line: rgba(14,14,14,.16); --grid: rgba(14,14,14,.055);
+  --accent: #F2362B; --accent-text: #B81C12; --pen: #2B44E0; --stage: #161617; --on-accent: #0E0E0E; --band: #0E0E0E; --on-band: #ECEBE6;
+  --f-display: "Archivo", "Arial Black", system-ui, sans-serif;
+  --f-body: "Archivo", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-note: "Caveat", "Comic Sans MS", cursive;
+  --f-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0B0B0C; --surface: #141415; --fg: #ECEBE6; --muted: #A3A29C; --line: rgba(255,255,255,.13); --grid: rgba(255,255,255,.035);
+  --accent: #F2362B; --accent-text: #FF6A5E; --pen: #93A3FF; --stage: #050505; --on-accent: #0E0E0E; --band: #1A1A1B; --on-band: #ECEBE6; color-scheme: dark; } }
+:root[data-theme="dark"] {
+  --bg: #0B0B0C; --surface: #141415; --fg: #ECEBE6; --muted: #A3A29C; --line: rgba(255,255,255,.13); --grid: rgba(255,255,255,.035);
+  --accent: #F2362B; --accent-text: #FF6A5E; --pen: #93A3FF; --stage: #050505; --on-accent: #0E0E0E; --band: #1A1A1B; --on-band: #ECEBE6; color-scheme: dark; }
+
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body {
+  background-color: var(--bg); color: var(--fg); font: 400 15px/1.55 var(--f-body);
+  background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--band); }
+a { color: inherit; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.wrap { max-width: 1320px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+
+/* top bar: an ink band like the tickers */
+.top { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--band); color: var(--on-band); border-bottom: 1px solid var(--line); }
+.top .wrap { display: flex; align-items: center; gap: 24px; padding-block: 10px; flex-wrap: wrap; }
+.mark { font: 900 18px/1 var(--f-display); font-stretch: 125%; text-transform: uppercase; letter-spacing: -.01em; text-decoration: none; }
+.mark span { color: var(--accent); }
+.top nav { display: flex; gap: 18px; flex-wrap: wrap; margin-left: auto; }
+.top nav a { font: 700 12px/1 var(--f-display); font-stretch: 125%; text-transform: uppercase; letter-spacing: .06em; text-decoration: none; opacity: .85; }
+.top nav a:hover { color: var(--accent); opacity: 1; }
+
+.label { font: 700 12px/1.2 var(--f-display); font-stretch: 125%; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
+h2 { font: 900 clamp(28px, 4vw, 44px)/.9 var(--f-display); font-stretch: 125%; text-transform: uppercase; letter-spacing: -.01em; margin: 0; text-wrap: balance; }
+h3 { font: 800 15px/1.2 var(--f-display); font-stretch: 125%; text-transform: uppercase; letter-spacing: .03em; margin: 0; }
+section { padding-block: 56px 8px; }
+.sechead { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; flex-wrap: wrap; border-bottom: 2px solid var(--fg); padding-bottom: 12px; margin-bottom: 24px; }
+.note { font: 700 22px/1.1 var(--f-note); color: var(--pen); }
+
+/* hero title: the selection device itself */
+.hero { padding-block: 36px 20px; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 420px); gap: 24px 48px; align-items: end; }
+.sel { position: relative; display: inline-block; padding: 4px 18px 0; margin: 14px 10px 18px; }
+.sel h1 { margin: 0; font: 900 clamp(40px, 8.5vw, 116px)/.86 var(--f-display); font-stretch: 125%; letter-spacing: -.01em; text-transform: uppercase; color: var(--accent); }
+.sel::before { content: ""; position: absolute; inset: -6px 0 -12px 0; border: 3px solid var(--accent); }
+.sel i { position: absolute; width: 14px; height: 14px; background: var(--bg); border: 3px solid var(--accent); }
+.sel i:nth-of-type(1) { left: -8px; top: -14px; } .sel i:nth-of-type(2) { right: -8px; top: -14px; } .sel i:nth-of-type(3) { left: -8px; bottom: -20px; }
+.sel i:nth-of-type(4) { right: -8px; bottom: -20px; } .sel i:nth-of-type(5) { left: calc(50% - 7px); top: -14px; } .sel i:nth-of-type(6) { left: calc(50% - 7px); bottom: -20px; }
+.hero p { margin: 0; max-width: 46ch; font-size: 16px; }
+.hero .kicker { display: flex; gap: 14px; align-items: center; }
+
+/* player */
+.player { display: grid; grid-template-columns: 230px minmax(0, 1fr) 340px; gap: 20px; align-items: start; }
+.list { display: flex; flex-direction: column; gap: 18px; max-height: 76vh; overflow: auto; padding-right: 4px; }
+.group { display: flex; flex-direction: column; gap: 2px; }
+.group .label { margin-bottom: 6px; }
+.comp { text-align: left; background: transparent; color: var(--fg); border: 0; border-left: 3px solid transparent; padding: 7px 10px; cursor: pointer; font: 600 14px/1.25 var(--f-body); }
+.comp small { display: block; font: 500 11px/1.2 var(--f-mono); color: var(--muted); margin-top: 2px; }
+.comp:hover { background: var(--surface); }
+.comp[aria-pressed="true"] { border-left-color: var(--accent); background: var(--surface); }
+.stagebox { background: var(--stage); min-height: 320px; display: grid; place-items: center; padding: 16px; position: relative;
+  background-image: repeating-conic-gradient(rgba(255,255,255,.035) 0 25%, transparent 0 50%); background-size: 24px 24px; }
+.stagebox canvas { display: block; max-width: 100%; max-height: 72vh; width: auto; height: auto; box-shadow: 0 0 0 1px rgba(255,255,255,.08); }
+.stagemsg { position: absolute; inset: auto 16px 16px 16px; color: #ECEBE6; font: 500 12px/1.4 var(--f-mono); white-space: pre-wrap; }
+.panel { display: flex; flex-direction: column; gap: 16px; }
+.panel p.desc { margin: 0; min-height: 3em; }
+.seg { display: flex; border: 1.5px solid var(--fg); }
+.seg button { flex: 1; background: transparent; color: var(--fg); border: 0; padding: 9px 6px; font: 700 12px/1 var(--f-display); font-stretch: 125%; text-transform: uppercase; cursor: pointer; }
+.seg button + button { border-left: 1.5px solid var(--fg); }
+.seg button[aria-pressed="true"] { background: var(--fg); color: var(--bg); }
+.seg button:disabled { opacity: .3; cursor: not-allowed; }
+.transport { display: flex; gap: 10px; align-items: center; }
+.btn { background: var(--accent); color: var(--on-accent); border: 0; padding: 10px 14px; font: 800 12px/1 var(--f-display); font-stretch: 125%; text-transform: uppercase; letter-spacing: .03em; cursor: pointer; min-height: 40px; }
+.btn.ghost { background: transparent; color: var(--fg); box-shadow: inset 0 0 0 1.5px var(--fg); }
+input[type=range] { flex: 1; accent-color: var(--accent); min-width: 0; }
+.readout { font: 500 12px/1.4 var(--f-mono); color: var(--muted); font-variant-numeric: tabular-nums; }
+.check { display: flex; gap: 8px; align-items: center; font-size: 14px; }
+textarea { width: 100%; min-height: 180px; resize: vertical; background: var(--surface); color: var(--fg); border: 1.5px solid var(--line); padding: 10px; font: 500 12px/1.45 var(--f-mono); }
+.cmd { display: flex; gap: 8px; align-items: stretch; }
+pre, code { font-family: var(--f-mono); }
+.cmd pre, .codeblock { margin: 0; flex: 1; min-width: 0; overflow-x: auto; background: var(--fg); color: var(--bg); padding: 10px 12px; font-size: 12px; line-height: 1.5; }
+.codeblock { white-space: pre; }
+.err { color: var(--accent-text); font: 500 12px/1.4 var(--f-mono); }
+
+/* tokens */
+.sheet { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr)); gap: 28px; }
+.swatches { display: grid; grid-template-columns: repeat(auto-fill, minmax(118px, 1fr)); gap: 10px; }
+.sw { aspect-ratio: 4 / 3; max-width: 100%; display: flex; flex-direction: column; justify-content: flex-end; padding: 10px; font: 500 11px/1.35 var(--f-mono); border: 1.5px solid var(--line); }
+.sw b { font: 800 12px/1.2 var(--f-display); font-stretch: 125%; text-transform: uppercase; }
+.type-row { display: grid; grid-template-columns: minmax(0, 1fr); gap: 2px; padding-block: 10px; border-bottom: 1px solid var(--line); }
+.type-row .spec { font: 500 11px/1.4 var(--f-mono); color: var(--muted); }
+.eases { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 16px; }
+.ease svg { width: 100%; height: auto; display: block; }
+.ease .track { height: 6px; background: var(--line); position: relative; margin-top: 8px; }
+.ease .dot { position: absolute; top: -5px; width: 16px; height: 16px; margin-left: -8px; background: var(--accent); }
+.ease code { font-size: 11px; color: var(--muted); }
+table { border-collapse: collapse; width: 100%; font-size: 14px; }
+th, td { text-align: left; vertical-align: top; padding: 9px 10px; border-bottom: 1px solid var(--line); }
+th { font: 700 11px/1.2 var(--f-display); font-stretch: 125%; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); }
+td.num { font-family: var(--f-mono); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.tablebox { overflow-x: auto; }
+.steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 380px), 1fr)); gap: 24px; }
+.step { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.rules { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 380px), 1fr)); gap: 28px; }
+.rules ul { margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 6px; }
+footer { padding-block: 48px; color: var(--muted); font-size: 13px; }
+
+@media (max-width: 1100px) { .player { grid-template-columns: 200px minmax(0, 1fr); } .panel { grid-column: 1 / -1; } }
+@media (max-width: 760px) {
+  .hero { grid-template-columns: minmax(0, 1fr); }
+  .player { grid-template-columns: minmax(0, 1fr); }
+  .list { flex-direction: row; overflow-x: auto; max-height: none; gap: 16px; padding-bottom: 6px; }
+  .group { min-width: 180px; }
+  .stagebox canvas { max-height: 62vh; }
+}
+@media (prefers-reduced-motion: reduce) { .ease .dot { transition: none; } }
+</style>
+<!--IS:BODY-START-->
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <a class="mark" href="#player">Ink <span>&amp;</span> Signal</a>
+    <nav aria-label="Sections"><a href="#player">Player</a><a href="#tokens">Tokens</a><a href="#components">Components</a><a href="#pipeline">Pipeline</a><a href="#rules">Rules</a></nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="hero">
+    <div>
+      <div class="kicker"><span class="label">Motion library v2 · Reels &amp; YouTube · 2D + 3D</span></div>
+      <div class="sel"><h1>Ink &amp; Signal</h1><i></i><i></i><i></i><i></i><i></i><i></i></div>
+    </div>
+    <div>
+      <p>Graph-paper daylight, blacked-out night footage and one signal red. Every template below is running live from the same deterministic runtime that renders your videos and rebuilds them in After Effects, Premiere Pro and DaVinci Resolve.</p>
+      <p class="note">pick a template, scrub it, change its words</p>
+    </div>
+  </div>
+
+  <section id="player" aria-label="Live player" style="padding-top: 8px">
+    <div class="player">
+      <div class="list" id="list" aria-label="Compositions"></div>
+      <div class="stagebox" id="stagebox"><canvas id="cv" width="1080" height="1920" aria-label="Composition preview"></canvas><div class="stagemsg" id="msg"></div></div>
+      <div class="panel">
+        <div>
+          <h3 id="ctitle">Chapter card</h3>
+          <p class="desc" id="cdesc"></p>
+        </div>
+        <div class="seg" role="group" aria-label="Format" id="formats">
+          <button type="button" data-f="reel" aria-pressed="true">Reel</button>
+          <button type="button" data-f="yt" aria-pressed="false">YouTube</button>
+          <button type="button" data-f="square" aria-pressed="false">Square</button>
+        </div>
+        <div class="transport">
+          <button class="btn" type="button" id="play">Pause</button>
+          <input type="range" id="scrub" min="0" max="100" value="0" aria-label="Frame">
+        </div>
+        <div class="readout" id="readout">loading…</div>
+        <label class="check" for="guides"><input type="checkbox" id="guides"> Show Reels UI zones</label>
+        <div>
+          <label class="label" for="params">Params (JSON)</label>
+          <textarea id="params" spellcheck="false"></textarea>
+          <div class="transport" style="margin-top: 8px">
+            <button class="btn" type="button" id="apply">Apply</button>
+            <button class="btn ghost" type="button" id="reset">Reset</button>
+            <span class="err" id="perr" role="status"></span>
+          </div>
+        </div>
+        <div>
+          <div class="label" style="margin-bottom: 6px">Render this</div>
+          <div class="cmd"><pre id="cli"></pre><button class="btn ghost" type="button" id="copycli">Copy</button></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="tokens">
+    <div class="sechead"><h2>Tokens</h2><span class="label">tokens/ink-signal.tokens.json</span></div>
+    <div class="sheet">
+      <div><h3 style="margin-bottom: 12px">Colour</h3><div class="swatches" id="swatches"></div>
+        <p style="font-size: 14px; color: var(--muted)">Signal red is the only loud colour. Small red text on paper uses Signal Deep.</p></div>
+      <div><h3 style="margin-bottom: 4px">Type</h3><div id="types"></div></div>
+    </div>
+    <div style="margin-top: 36px"><h3 style="margin-bottom: 12px">Easing</h3><div class="eases" id="eases"></div></div>
+    <div style="margin-top: 36px" class="sheet">
+      <div><h3 style="margin-bottom: 8px">Timing <span class="readout">frames @ 30 fps</span></h3><div class="tablebox"><table id="durations"><thead><tr><th scope="col">Beat</th><th scope="col">Frames</th><th scope="col">ms</th></tr></thead><tbody></tbody></table></div></div>
+      <div><h3 style="margin-bottom: 8px">3D</h3><div class="tablebox"><table id="three"><tbody></tbody></table></div></div>
+    </div>
+  </section>
+
+  <section id="components">
+    <div class="sechead"><h2>Components</h2><span class="label">runtime/components.js</span></div>
+    <div class="tablebox"><table>
+      <thead><tr><th scope="col">Component</th><th scope="col">Anatomy</th><th scope="col">Motion</th></tr></thead>
+      <tbody>
+        <tr><td><b>selectionTitle</b></td><td>Display type in a 3 px accent box with 8 white handles, optional W · H label</td><td>Box draws from its corner (6f snap), handles pop (4f stamp), type lands 112 → 100 % (12f snap)</td></tr>
+        <tr><td><b>ticker</b></td><td>64 px ink band, 1 px rules, caps labels, star · sparkle · plus separator</td><td>Linear 120 px/s, never eases; bands alternate direction</td></tr>
+        <tr><td><b>hud / hudCorners</b></td><td>22 px caps in the corners, coordinates in mono</td><td>Type-on 1 character per frame, corners staggered</td></tr>
+        <tr><td><b>glyphRow</b></td><td>Star, sparkle, plus</td><td>Rotate −90° → 0°, scale 0 → 100 (8f stamp), 3f stagger</td></tr>
+        <tr><td><b>handNote · arrow · circleMark</b></td><td>Caveat in pen blue or white, 5 px round strokes</td><td>Write-on 18f, arrow 12f, circle 14f (write)</td></tr>
+        <tr><td><b>polaroid · cutout</b></td><td>White card with caption; ink photo circle with an accent sticker ring</td><td>Drop 60 px and −10° → final (14f stamp); cutout stamps like a glyph</td></tr>
+        <tr><td><b>captions</b></td><td>Display caps, ≤ 2 lines per page</td><td>Active word on an accent plate, 94 → 106 % (3f stamp)</td></tr>
+        <tr><td><b>lowerThird · stepChip</b></td><td>Name bar + role bar; chip from the left edge</td><td>Slide in 10f snap, out 8f exit</td></tr>
+        <tr><td><b>punchWord</b></td><td>Accent plate, ink type, white outline</td><td>220 → 94 → 100 %, −30° → −6° in 6f, 1.2 px wiggle</td></tr>
+        <tr><td><b>callout</b></td><td>Selection rectangle around anything in shot, mono tag, live W · H</td><td>Same rhythm as selectionTitle</td></tr>
+        <tr><td><b>tornWipe · tickerWipe · flash</b></td><td>Transitions; the frame is fully covered where the cut goes</td><td>10f in (wipe), 2f covered, 10f out · 2f flash</td></tr>
+        <tr><td><b>3D: gizmoTitle · popupPaper · tickerRing · polaroidFlythrough · paperRoll</b></td><td>Extruded Archivo Expanded, red faces, ink sides, long lens, top-left key light</td><td>Camera moves on wipe, holds on drift; gizmo edges draw, handles pop</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <section id="pipeline">
+    <div class="sechead"><h2>Pipeline</h2><span class="label">render/ · integrations/</span></div>
+    <div class="steps" id="steps"></div>
+    <div class="tablebox" style="margin-top: 32px"><table>
+      <thead><tr><th scope="col">App</th><th scope="col">No scripting</th><th scope="col">Scripted / MCP</th></tr></thead>
+      <tbody>
+        <tr><td><b>After Effects</b></td><td>Import pkg/renders/*.mov</td><td><code>InkSignal.buildFromPackage("/abs/pkg")</code> rebuilds native, editable comps: real text, shapes, eased keyframes, text animators, masks</td></tr>
+        <tr><td><b>Premiere Pro</b></td><td>File › Import › pkg/timeline.xml</td><td><code>InkSignalPPro.assemble("/abs/pkg")</code> via the MCP's ExtendScript tool, or its import + add-to-timeline tools with manifest.json</td></tr>
+        <tr><td><b>DaVinci Resolve</b></td><td>File › Import › Timeline › pkg/timeline.xml</td><td><code>assemble("/abs/pkg")</code> via the MCP's Python tool · <code>add_title("Setup")</code> for native Text+</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <section id="rules">
+    <div class="sechead"><h2>Rules</h2><span class="label">tokens.rules</span></div>
+    <div class="rules"><div><h3 style="margin-bottom: 10px">Do</h3><ul id="do"></ul></div><div><h3 style="margin-bottom: 10px">Don't</h3><ul id="dont"></ul></div></div>
+  </section>
+
+  <footer>Ink &amp; Signal v2 · fonts SIL OFL · three.js MIT · Visual language inspired by Raagav Sundar's Graphic Design Portfolio 2026 (Behance); no artwork from it is included.</footer>
+</main>
+
+<script type="importmap">
+{ "imports": { "three": "../runtime/vendor/three.module.min.js", "three/addons/": "../runtime/vendor/addons/" } }
+</script>
+<script type="module">
+const ROOT = new URL(document.querySelector('meta[name="is-root"]').content, location.href).href;
+const $ = (id) => document.getElementById(id);
+const msg = $('msg');
+let T, boot, COMPS;
+try {
+  ({ T } = await import(ROOT + 'runtime/core.js'));
+  ({ boot } = await import(ROOT + 'runtime/player.js'));
+  ({ COMPS } = await import(ROOT + 'runtime/comps/index.js'));
+} catch (e) { msg.textContent = 'Could not load the runtime: ' + e.message; throw e; }
+
+/* ───── reference sheets ───── */
+const sw = $('swatches');
+for (const [k, v] of Object.entries(T.color)) {
+  if (typeof v !== 'string') continue;
+  const d = document.createElement('div'); d.className = 'sw'; d.style.background = v;
+  const lum = (() => { const h = v.slice(1); const n = (i) => parseInt(h.substr(i, 2), 16) / 255; return 0.2126 * n(0) + 0.7152 * n(2) + 0.0722 * n(4); })();
+  d.style.color = lum > 0.45 ? '#0E0E0E' : '#ECEBE6';
+  d.innerHTML = `<b>${k.replace(/([A-Z])/g, ' $1')}</b>${v}`; sw.appendChild(d);
+}
+const CSSFONT = {
+  display: 'font: 900 44px/0.95 var(--f-display); font-stretch: 125%; text-transform: uppercase',
+  label: 'font: 800 20px/1.1 var(--f-display); font-stretch: 125%; text-transform: uppercase; letter-spacing: .02em',
+  hud: 'font: 700 16px/1.1 var(--f-display); font-stretch: 125%; text-transform: uppercase; letter-spacing: .02em; color: var(--accent-text)',
+  body: 'font: 400 17px/1.4 var(--f-body)', bodyStrong: 'font: 600 17px/1.4 var(--f-body)',
+  note: 'font: 700 32px/1 var(--f-note); color: var(--pen)', noteSoft: 'font: 600 28px/1 var(--f-note)',
+  data: 'font: 700 16px/1.3 var(--f-mono)', dataSoft: 'font: 500 16px/1.3 var(--f-mono)',
+};
+const SAMPLE = { display: 'Setup', label: 'Chapter 02', hud: 'Portfolio of @yourhandle', body: 'I make things. Here is how.', bodyStrong: 'Hi, I’m [Your Name].', note: 'this bit is the secret →', noteSoft: 'day 90. okay, it worked', data: '00°00′00″ N, 00°00′00″ E', dataSoft: '00:04:12:08' };
+for (const [k, f] of Object.entries(T.font)) {
+  if (typeof f !== 'object') continue;
+  const r = document.createElement('div'); r.className = 'type-row';
+  r.innerHTML = `<div style="${CSSFONT[k] || ''}">${SAMPLE[k] || k}</div><div class="spec">${k} · ${f.family} ${f.style} · lh ${f.lineHeight} · tracking ${f.tracking}${f.case === 'upper' ? ' · caps' : ''}</div>`;
+  $('types').appendChild(r);
+}
+const bez = (x1, y1, x2, y2) => { const cx = 3 * x1, bx = 3 * (x2 - x1) - cx, ax = 1 - cx - bx, cy = 3 * y1, by = 3 * (y2 - y1) - cy, ay = 1 - cy - by;
+  return (x) => { let t = x; for (let i = 0; i < 8; i++) { const e = ((ax * t + bx) * t + cx) * t - x, d = (3 * ax * t + 2 * bx) * t + cx; if (Math.abs(d) < 1e-6) break; t -= e / d; } return ((ay * t + by) * t + cy) * t; }; };
+const dots = [];
+for (const [k, e] of Object.entries(T.ease)) {
+  if (!e.bezier) continue;
+  const f = bez(...e.bezier); let pts = '';
+  for (let i = 0; i <= 60; i++) { const x = i / 60; pts += `${(x * 100).toFixed(1)},${(100 - f(x) * 100).toFixed(1)} `; }
+  const el = document.createElement('div'); el.className = 'ease';
+  el.innerHTML = `<svg viewBox="-8 -40 116 156" role="img" aria-label="${k} easing curve"><rect x="0" y="0" width="100" height="100" fill="none" stroke="var(--line)" stroke-width="1.5"></rect><polyline points="${pts}" fill="none" stroke="var(--accent)" stroke-width="4" stroke-linejoin="round"></polyline></svg>
+    <h3>${k}</h3><code>${e.bezier.join(', ')}</code><div class="readout" style="font-size: 11px">${e.use}</div><div class="track"><div class="dot"></div></div>`;
+  $('eases').appendChild(el); dots.push([el.querySelector('.dot'), f]);
+}
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+if (!reduce) { const t0 = performance.now(); const loop = (now) => { const p = ((now - t0) / 1400) % 1.4; for (const [d, f] of dots) d.style.left = (Math.min(1, p) <= 1 ? f(Math.min(1, p)) * 100 : 100) + '%'; requestAnimationFrame(loop); }; requestAnimationFrame(loop); }
+else for (const [d] of dots) d.style.left = '100%';
+const dtb = $('durations').querySelector('tbody');
+for (const [k, v] of Object.entries(T.duration)) { if (typeof v !== 'number') continue; dtb.insertAdjacentHTML('beforeend', `<tr><td>${k.replace(/([A-Z])/g, ' $1').toLowerCase()}</td><td class="num">${v}</td><td class="num">${Math.round(v / 30 * 1000)}</td></tr>`); }
+const X = T.three;
+for (const [k, v] of [['Camera', `fov ${X.camera.fov}° (long lens), orbit ≤ ${X.camera.maxOrbitDeg}°`], ['Key light', `azimuth ${X.light.key.azimuth}°, elevation ${X.light.key.elevation}°, ${X.light.key.intensity}`], ['Rim (night)', `accent, ${X.light.rim.intensity}`], ['Faces', 'signal or ink · sides always ink'], ['Extrude', `depth ${X.extrude.depth} × size, bevel ${X.extrude.bevelSize}`], ['Moves', 'wipe between holds, drift while holding']]) $('three').querySelector('tbody').insertAdjacentHTML('beforeend', `<tr><th scope="row">${k}</th><td>${v}</td></tr>`);
+for (const r of T.rules.do) $('do').insertAdjacentHTML('beforeend', `<li>${r}</li>`);
+for (const r of T.rules.dont) $('dont').insertAdjacentHTML('beforeend', `<li>${r}</li>`);
+const STEPS = [
+  ['Set up once', 'cd ink-signal\nnpm install\nnpx playwright install chromium'],
+  ['Render any template', "node render/cli.mjs render chapter --format reel \\\n  --params '{\"title\":\"Setup\"}' --out chapter.mp4"],
+  ['Overlay with alpha for any NLE', 'node render/cli.mjs render ov-lowerthird --format yt --out lt.mov'],
+  ['Beat grid and caption words', 'python3 render/beats.py track.mp3 --out beats.json\npython3 tools/words.py talk.srt --out words.json'],
+  ['A whole reel from an edit plan', 'node render/build-reel.mjs plan.json --out reel.mp4 --beats'],
+  ['Package for AE · Premiere · Resolve', 'node render/nle.mjs plan.json --out pkg'],
+];
+for (const [h, c] of STEPS) $('steps').insertAdjacentHTML('beforeend', `<div class="step"><h3>${h}</h3><div class="cmd"><pre class="codeblock">${c}</pre><button class="btn ghost copy" type="button">Copy</button></div></div>`);
+const copy = async (btn, text) => { try { await navigator.clipboard.writeText(text); btn.textContent = 'Copied'; } catch { const pre = btn.previousElementSibling; const r = document.createRange(); r.selectNodeContents(pre); const s = getSelection(); s.removeAllRanges(); s.addRange(r); btn.textContent = 'Selected'; } setTimeout(() => (btn.textContent = 'Copy'), 1400); };
+document.querySelectorAll('.copy').forEach((b) => b.addEventListener('click', () => copy(b, b.previousElementSibling.textContent)));
+
+/* ───── live player ───── */
+const KINDS = [['title', 'Titles'], ['aroll', 'A-roll'], ['3d', '3D'], ['overlay', 'Overlays'], ['transition', 'Transitions'], ['sequence', 'Whole edit']];
+const list = $('list');
+for (const [kind, label] of KINDS) {
+  const items = Object.values(COMPS).filter((d) => d.kind === kind);
+  if (!items.length) continue;
+  const g = document.createElement('div'); g.className = 'group';
+  g.innerHTML = `<div class="label">${label}</div>`;
+  for (const d of items) { const b = document.createElement('button'); b.type = 'button'; b.className = 'comp'; b.dataset.name = d.name; b.setAttribute('aria-pressed', 'false'); b.innerHTML = `${d.title}<small>${d.name}</small>`; b.onclick = () => select(d.name); g.appendChild(b); }
+  list.appendChild(g);
+}
+let current = 'chapter', format = 'reel', IS = null, frame = 0, playing = true, last = performance.now(), busy = false, token = 0, userParams = null;
+const editable = (d) => { const p = { ...d.defaults }; delete p.format; delete p.accent; delete p.bg; if (d.name === 'edit') return { plan: null }; return p; };
+function syncUI() {
+  const d = COMPS[current];
+  document.querySelectorAll('.comp').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.name === current)));
+  $('ctitle').textContent = d.title; $('cdesc').textContent = d.description;
+  document.querySelectorAll('#formats button').forEach((b) => { b.disabled = !d.formats.includes(b.dataset.f); b.setAttribute('aria-pressed', String(b.dataset.f === format)); });
+  $('guides').disabled = format !== 'reel';
+  const p = userParams || {}; const q = Object.keys(p).length ? ` \\\n  --params '${JSON.stringify(p)}'` : '';
+  $('cli').textContent = `node render/cli.mjs render ${current} --format ${format}${q} --out ${current}.${['overlay', 'transition'].includes(d.kind) ? 'mov' : 'mp4'}`;
+}
+async function load() {
+  const my = ++token; const d = COMPS[current];
+  if (!d.formats.includes(format)) format = d.formats[0];
+  syncUI(); msg.textContent = 'loading ' + current + '…';
+  if (IS && IS.dispose) IS.dispose();
+  const old = $('cv'); const cv = document.createElement('canvas'); cv.id = 'cv'; cv.setAttribute('aria-label', d.title + ' preview'); old.replaceWith(cv);
+  try {
+    const params = { ...(userParams || {}), format };
+    const inst = await boot({ canvas: cv, root: ROOT, comp: current, params, guides: $('guides').checked });
+    if (my !== token) { inst.dispose(); return; }
+    IS = inst; frame = playing && !reduce ? 0 : Math.floor(IS.duration * 0.6); $('scrub').max = IS.duration - 1; msg.textContent = '';
+  } catch (e) { if (my === token) { msg.textContent = 'Error: ' + (e && e.message || e); IS = null; } }
+}
+function select(name) { current = name; userParams = null; $('params').value = JSON.stringify(editable(COMPS[name]), null, 1); $('perr').textContent = ''; load(); }
+document.querySelectorAll('#formats button').forEach((b) => b.addEventListener('click', () => { if (b.disabled) return; format = b.dataset.f; load(); }));
+$('guides').addEventListener('change', load);
+$('play').addEventListener('click', () => { playing = !playing; $('play').textContent = playing ? 'Pause' : 'Play'; });
+$('scrub').addEventListener('input', () => { frame = +$('scrub').value; playing = false; $('play').textContent = 'Play'; });
+$('apply').addEventListener('click', () => { try { userParams = JSON.parse($('params').value); $('perr').textContent = ''; load(); } catch (e) { $('perr').textContent = 'That is not valid JSON: ' + e.message; } });
+$('reset').addEventListener('click', () => select(current));
+$('copycli').addEventListener('click', () => copy($('copycli'), $('cli').textContent));
+const tick = async (now) => {
+  if (IS && !busy) {
+    busy = true;
+    if (playing && !reduce) frame = (frame + ((now - last) / 1000) * IS.fps) % IS.duration;
+    try { await IS.seek(Math.floor(frame)); } catch (e) { msg.textContent = 'Error: ' + e.message; }
+    $('scrub').value = Math.floor(frame);
+    $('readout').textContent = `f ${String(Math.floor(frame)).padStart(3, '0')} / ${IS.duration} · ${(frame / IS.fps).toFixed(2)} s · ${IS.spec.width}×${IS.spec.height} @ ${IS.fps}`;
+    busy = false;
+  }
+  last = now; requestAnimationFrame(tick);
+};
+if (reduce) { playing = false; $('play').textContent = 'Play'; }
+select('chapter');
+requestAnimationFrame(tick);
+</script>
+<!--IS:BODY-END-->
+</body>
+</html>
