@@ -1,0 +1,561 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Ink &amp; Signal — motion design system for Reels, YouTube and SaaS explainers</title>
+<meta name="description" content="64 motion-graphics templates — explainers, motion B-roll, infographics, cards, kinetic titles, transitions, 3D — rendered from code, with a measured sound pass and After Effects, Premiere Pro and DaVinci Resolve hand-off. Built for Claude.">
+<meta name="theme-color" content="#0B0B0C">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Ink & Signal — a motion design system you can render">
+<meta property="og:description" content="Explainers, motion B-roll, infographics, cards, kinetic titles and transitions for Reels, YouTube and SaaS videos. Every frame is code.">
+<meta property="og:url" content="https://akashkhairal.github.io/ink-signal/">
+<meta property="og:image" content="https://akashkhairal.github.io/ink-signal/docs/media/banner.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="site/favicon.svg" type="image/svg+xml">
+<link rel="preload" href="fonts/Archivo-Variable.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="site/site.css">
+</head>
+<body>
+<svg class="sprite" aria-hidden="true" focusable="false">
+  <symbol id="g-star" viewBox="0 0 24 24"><path d="M12 1.5l2.9 6.6 7.1.6-5.4 4.7 1.6 7-6.2-3.7-6.2 3.7 1.6-7L2 8.7l7.1-.6z"/></symbol>
+  <symbol id="g-sparkle" viewBox="0 0 24 24"><path d="M12 0c.7 6.3 5 10.6 12 12-7 1.4-11.3 5.7-12 12-.7-6.3-5-10.6-12-12C7 10.6 11.3 6.3 12 0z"/></symbol>
+  <symbol id="g-plus" viewBox="0 0 24 24"><path d="M9 1h6v8h8v6h-8v8H9v-8H1V9h8z"/></symbol>
+  <symbol id="i-copy" viewBox="0 0 24 24"><rect x="8" y="8" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"/><path d="M16 8V3H3v13h5" fill="none" stroke="currentColor" stroke-width="2"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M4 12.5l5 5L20 6.5" fill="none" stroke="currentColor" stroke-width="2.4"/></symbol>
+  <symbol id="i-play" viewBox="0 0 24 24"><path d="M7 4.5v15l12.5-7.5z"/></symbol>
+  <symbol id="i-pause" viewBox="0 0 24 24"><path d="M6 4.5h4.2v15H6zM13.8 4.5H18v15h-4.2z"/></symbol>
+  <symbol id="i-close" viewBox="0 0 24 24"><path d="M5 5l14 14M19 5L5 19" fill="none" stroke="currentColor" stroke-width="2.2"/></symbol>
+  <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M3 12h16M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2"/></symbol>
+  <symbol id="i-prev" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2.2"/></symbol>
+  <symbol id="i-next" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2.2"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="2.2"/><path d="M15.5 15.5L21 21" stroke="currentColor" stroke-width="2.2"/></symbol>
+  <symbol id="i-ext" viewBox="0 0 24 24"><path d="M14 4h6v6M20 4l-9 9M18 14v6H4V6h6" fill="none" stroke="currentColor" stroke-width="2"/></symbol>
+  <symbol id="i-menu" viewBox="0 0 24 24"><path d="M3 7h18M3 12h18M3 17h18" stroke="currentColor" stroke-width="2.2"/></symbol>
+  <symbol id="i-github" viewBox="0 0 24 24"><path d="M12 .8a11.2 11.2 0 0 0-3.5 21.8c.6.1.8-.2.8-.6v-2.1c-3.1.7-3.8-1.4-3.8-1.4-.5-1.3-1.2-1.6-1.2-1.6-1-.7.1-.7.1-.7 1.1.1 1.7 1.2 1.7 1.2 1 1.7 2.6 1.2 3.3.9.1-.7.4-1.2.7-1.5-2.5-.3-5.1-1.2-5.1-5.5 0-1.2.4-2.2 1.2-3-.1-.3-.5-1.4.1-3 0 0 .9-.3 3.1 1.2a10.6 10.6 0 0 1 5.6 0c2.1-1.5 3.1-1.2 3.1-1.2.6 1.6.2 2.7.1 3 .7.8 1.2 1.8 1.2 3 0 4.3-2.6 5.2-5.1 5.5.4.3.8 1 .8 2.1v3.1c0 .3.2.7.8.6A11.2 11.2 0 0 0 12 .8z"/></symbol>
+</svg>
+
+<a class="skip" href="#library">Skip to the templates</a>
+
+<!-- ═══════════ top bar ═══════════ -->
+<header class="top" id="top">
+  <div class="top-in">
+    <a class="mark" href="#home" aria-label="Ink & Signal, back to top"><i class="mark-sq"></i><span>Ink <em>&amp;</em> Signal</span></a>
+    <nav class="nav" id="nav" aria-label="Sections">
+      <a href="#explainers">Explainers</a>
+      <a href="#library">Templates</a>
+      <a href="#choose">What to use</a>
+      <a href="#start">Docs</a>
+      <a href="#system">System</a>
+      <a href="#claude">Claude</a>
+    </nav>
+    <span class="ver mono" id="ver">v3.0</span>
+    <a class="btn btn-ink btn-sm gh" href="https://github.com/AkashKhairal/ink-signal"><svg><use href="#i-github"/></svg><span>GitHub</span></a>
+    <button class="menu" type="button" aria-label="Open the menu" aria-expanded="false" aria-controls="nav"><svg><use href="#i-menu"/></svg></button>
+  </div>
+</header>
+
+<main id="home">
+<!-- ═══════════ hero (night) ═══════════ -->
+<section class="hero night" aria-labelledby="hero-title">
+  <div class="vf" aria-hidden="true"><i class="tl"></i><i class="tr"></i><i class="bl"></i><i class="br"></i></div>
+  <div class="hud hud-tl" aria-hidden="true">Library v3<br><span>Open source · MIT</span></div>
+  <div class="hud hud-tr" aria-hidden="true"><span class="type" data-type="Scene 01 / 06">Scene 01 / 06</span><br><span>Reels · YouTube · SaaS</span></div>
+  <div class="hud hud-bl" aria-hidden="true"><span id="hud-count">64 templates</span> · 2 engines</div>
+  <div class="hud hud-br" aria-hidden="true"><i class="rec"></i><span id="tc">00:00:00:00</span></div>
+
+  <div class="wrap hero-grid">
+    <div class="hero-copy">
+            <h1 class="hero-title display" id="hero-title">
+        <span class="l1">Ink &amp;</span>
+        <span class="sel reveal"><span class="t">Signal</span><i class="h"></i><i class="h"></i><i class="h"></i><i class="h"></i><i class="h"></i><i class="h"></i><i class="h"></i><i class="h"></i><b class="dim mono"></b></span>
+      </h1>
+      <p class="tagline">A motion design system you can render.</p>
+      <p class="lead">Reels, YouTube edits and SaaS explainers that look like they came from one studio. Every frame is code: previewed live in your browser, rendered to MP4 or ProRes, and rebuilt natively in After Effects, Premiere Pro and DaVinci Resolve. Built for Claude.</p>
+      <div class="ctas">
+        <a class="btn btn-signal" href="#library">Browse <span data-count="templates">64</span> templates <svg><use href="#i-arrow"/></svg></a>
+        <a class="btn btn-line" href="#start">Get started</a>
+      </div>
+      <div class="clone">
+        <code class="mono">git clone https://github.com/AkashKhairal/ink-signal</code>
+        <button class="copy" type="button" data-copy="git clone https://github.com/AkashKhairal/ink-signal.git" aria-label="Copy the clone command"><svg><use href="#i-copy"/></svg></button>
+      </div>
+    </div>
+
+    <figure class="monitor" aria-label="Showreel of templates">
+      <div class="ghost g1" aria-hidden="true"></div><div class="ghost g2" aria-hidden="true"></div>
+      <div class="screen">
+        <video id="reel" muted playsinline preload="metadata" poster="site/media/x-hype.jpg"></video>
+        <div class="reel-bar" aria-hidden="true"><i id="reel-prog"></i></div>
+      </div>
+      <figcaption>
+        <span class="hud">Now playing</span>
+        <b id="reel-title">High-energy promo</b><code class="mono" id="reel-name">x-hype</code>
+        <button class="link" type="button" id="reel-open">Open the live player <svg><use href="#i-arrow"/></svg></button>
+      </figcaption>
+      <p class="note note-white note-hero reveal" aria-hidden="true">each one is a params file<svg viewBox="0 0 120 70"><path d="M8 8 C 40 4, 86 18, 104 56 M92 50 L104 57 L106 43"/></svg></p>
+    </figure>
+  </div>
+</section>
+
+<div class="ticker" aria-hidden="true"><div class="ticker-track" data-ticker="64 templates|Explainers|Motion B-roll|Infographics|Cards|Kinetic titles|Transitions|3D|103 CC0 sounds|−14 LUFS, measured|After Effects|Premiere Pro|DaVinci Resolve|Built for Claude"></div></div>
+
+<!-- ═══════════ explainers (night) ═══════════ -->
+<section class="night sec" id="explainers" aria-labelledby="ex-title">
+  <div class="wrap">
+    <div class="sec-head">
+      <h2 class="display sec-title" id="ex-title"><span class="sel reveal"><span class="t">Explainers</span><i class="h"></i><i class="h"></i><i class="h"></i><i class="h"></i><i class="h"></i><i class="h"></i><i class="h"></i><i class="h"></i><b class="dim mono"></b></span></h2>
+      <p class="sec-lead">A whole product video from one params file. Write the words, keep your accent colour, and the template does the timing: beats, camera moves, cursor clicks and sound cues.</p>
+    </div>
+    <div class="feat" id="featured"></div>
+  </div>
+</section>
+
+<!-- ═══════════ library (paper) ═══════════ -->
+<section class="paper sec" id="library" aria-labelledby="lib-title">
+  <div class="wrap">
+    <div class="sec-head">
+      <h2 class="display sec-title" id="lib-title"><span class="sel reveal"><span class="t">Templates</span><i class="h"></i><i class="h"></i><i class="h"></i><i class="h"></i><i class="h"></i><i class="h"></i><i class="h"></i><i class="h"></i><b class="dim mono"></b></span></h2>
+      <p class="sec-lead">Every template, playing. Click one to open it in the live player, change its words and formats, and copy the command that renders it.</p>
+    </div>
+  </div>
+  <div class="toolbar" id="toolbar">
+    <div class="wrap toolbar-in">
+      <div class="chips" id="chips" role="tablist" aria-label="Filter by category"></div>
+      <label class="search"><svg><use href="#i-search"/></svg><span class="sr">Search templates</span><input id="q" type="search" placeholder="Search — chart, launch, quote, logo…" autocomplete="off"></label>
+    </div>
+  </div>
+  <div class="wrap">
+    <div id="groups" class="groups" aria-live="polite"></div>
+    <p class="empty" id="empty" hidden>Nothing matches that. Try “chart”, “title” or “transition”.</p>
+  </div>
+</section>
+
+<!-- ═══════════ chooser (paper) ═══════════ -->
+<section class="paper-note sec" id="choose" aria-labelledby="ch-title">
+  <div class="wrap">
+    <div class="sec-head">
+      <h2 class="display sec-title" id="ch-title"><span class="sel reveal"><span class="t">What to use</span><i class="h"></i><i class="h"></i><i class="h"></i><i class="h"></i><i class="h"></i><i class="h"></i><i class="h"></i><i class="h"></i><b class="dim mono"></b></span></h2>
+      <p class="sec-lead">Start from the job, not the template. Each row lists the templates that do it, best first.</p>
+    </div>
+    <ul class="jobs" id="jobs"></ul>
+  </div>
+</section>
+
+<!-- ═══════════ docs (paper) ═══════════ -->
+<section class="paper sec docs" id="start" aria-labelledby="doc-title">
+  <div class="wrap">
+    <div class="sec-head">
+      <h2 class="display sec-title" id="doc-title"><span class="sel reveal"><span class="t">Docs</span><i class="h"></i><i class="h"></i><i class="h"></i><i class="h"></i><i class="h"></i><i class="h"></i><i class="h"></i><i class="h"></i><b class="dim mono"></b></span></h2>
+      <p class="sec-lead">From a fresh clone to a finished, mixed video and an editable timeline. Every command below runs from the library folder.</p>
+    </div>
+
+    <div class="docs-grid">
+      <nav class="toc" aria-label="Docs">
+        <span class="hud">On this page</span>
+        <a href="#d-install">Install</a>
+        <a href="#d-look">Look first</a>
+        <a href="#d-render">Render</a>
+        <a href="#d-plan">Edit plans</a>
+        <a href="#d-explainer">Explainers</a>
+        <a href="#d-broll">Motion B-roll</a>
+        <a href="#d-sound">Sound pass</a>
+        <a href="#d-behind">Title behind you</a>
+        <a href="#d-nle">Your editor</a>
+        <a href="#d-scene">Your own scene</a>
+        <a href="#d-ref">Reference</a>
+      </nav>
+
+      <div class="doc">
+        <article id="d-install">
+          <h3>Install</h3>
+          <p>You need <b>Node 18+</b>, <b>ffmpeg</b> and <b>Python 3</b> with numpy and Pillow. Playwright drives a headless Chromium that renders every frame.</p>
+<pre class="code" data-lang="bash"><code>git clone https://github.com/AkashKhairal/ink-signal.git && cd ink-signal
+npm install && npx playwright install chromium
+
+node render/cli.mjs list        # every template and what it does
+node render/serve.mjs           # this website + live stages at http://127.0.0.1:5178/</code></pre>
+          <p class="aside">Optional: <code>pip install faster-whisper</code> for word timings, and <code>transformers</code> + <code>torch</code> for SAM 2 cut-outs (title behind you).</p>
+        </article>
+
+        <article id="d-look">
+          <h3>Look before you render</h3>
+          <p>A contact sheet renders a handful of moments in seconds. Check it for anything clipped, overlapping, unreadable or off-brand, then render.</p>
+<pre class="code" data-lang="bash"><code>node render/cli.mjs sheet ig-bars --format reel --auto 9 --out check.png        # 9 evenly spaced frames
+node render/cli.mjs sheet mb-terminal --times 0.5,1.9,2.8,5.4 --out words.png   # stills on the key words
+node render/cli.mjs still t-slam --frame 60 --out slam.png</code></pre>
+          <p class="note note-pen reveal" aria-hidden="true">always look first<svg viewBox="0 0 120 70"><path d="M110 10 C 80 6, 40 20, 16 56 M30 54 L16 57 L18 42"/></svg></p>
+        </article>
+
+        <article id="d-render">
+          <h3>Render</h3>
+          <p>Any template, any format. Params override the template's defaults (each one's are in the live player and in <a href="https://github.com/AkashKhairal/ink-signal/blob/main/docs/CATALOG.md">CATALOG.md</a>).</p>
+<pre class="code" data-lang="bash"><code>node render/cli.mjs render t-slam --format reel --params '{"text":"Orbit","human":"made for creators"}' --out slam.mp4
+node render/cli.mjs render ig-counter --format yt --params-file stat.json --blur 4 --out stat.mp4
+node render/cli.mjs render x-hype --params '{"product":"Orbit","accent":"#2B6BF2"}' --blur 4 --out promo.mp4
+node render/cli.mjs render tr-flood --params '{"transparent":true}' --out flood.mov     # ProRes 4444 + alpha</code></pre>
+          <div class="table"><table>
+            <thead><tr><th scope="col">Option</th><th scope="col">What it does</th></tr></thead>
+            <tbody>
+              <tr><td><code>--format</code></td><td><code>reel</code> 1080×1920 · <code>yt</code> 1920×1080 · <code>square</code> 1080×1080 · <code>portrait</code> 1080×1350 (edit plans)</td></tr>
+              <tr><td><code>--params</code> · <code>--params-file</code></td><td>JSON merged over the defaults. Motion scenes also take <code>accent</code>, <code>theme</code>, <code>transparent</code>, <code>width</code>, <code>height</code>, <code>fps</code>.</td></tr>
+              <tr><td><code>--blur N</code></td><td>Real motion blur: N subframes per frame. <code>1</code> for drafts, <code>4</code> for finals (slower: one screenshot per subframe).</td></tr>
+              <tr><td><code>--out</code></td><td><code>.mp4</code> H.264 · <code>.mov</code> ProRes (4444 with alpha for transparent templates) · <code>.webm</code> · <code>folder/</code> PNG sequence</td></tr>
+              <tr><td><code>--from</code> · <code>--to</code></td><td>Render a frame range only.</td></tr>
+              <tr><td><code>--no-grain</code></td><td>Skip film grain (smaller files, GIFs).</td></tr>
+            </tbody>
+          </table></div>
+          <p>Every render also writes <code>.markers.json</code> (cuts and beats) and <code>.cues.json</code> (sound cues) next to the file. Motion scenes render at any size — 720p, 4K, GIF-sized — and stay the same picture.</p>
+        </article>
+
+        <article id="d-plan">
+          <h3>Edit plans</h3>
+          <p>A whole Reel or YouTube video in one JSON file: your clips, any templates, overlays on clips, transitions on cuts, music. Cuts can snap to the downbeats of your track.</p>
+<pre class="code" data-lang="json"><code>{
+  "name": "launch-reel", "format": "reel", "fps": 30, "accent": "#F2362B",
+  "audio": { "music": "music/track.mp3", "musicGainDb": -9, "lufs": -14 },
+  "snap": "downbeat",
+  "timeline": [
+    { "type": "comp", "comp": "t-countdown", "params": { "word": "Ship" } },
+    { "type": "transition", "comp": "tr-bars" },
+    { "type": "clip", "src": "clips/talk.mp4", "in": 4.2, "out": 9.8, "look": "aroll",
+      "overlays": [ { "comp": "ov-captions", "at": 0, "params": { "words": [ { "text": "First", "start": 0.1, "end": 0.45 } ] } } ] },
+    { "type": "comp", "comp": "ig-counter", "params": { "value": 12400, "label": "Signups in week one" } },
+    { "type": "transition", "comp": "tr-flood" },
+    { "type": "comp", "comp": "endcard", "duration": 3 }
+  ]
+}</code></pre>
+<pre class="code" data-lang="bash"><code>python3 render/beats.py track.mp3 --out beats.json            # tempo, beats, downbeats, the drop
+python3 tools/words.py talk.srt --from 4.2 --to 9.8 --out words.json
+node render/cli.mjs sheet plan.json --frames 0,30,60,90,120 --out review.png
+node render/build-reel.mjs plan.json --out reel.mp4 --blur 3 --beats   # picture + audio, −14 LUFS</code></pre>
+          <div class="table"><table>
+            <thead><tr><th scope="col">Item</th><th scope="col">Fields</th></tr></thead>
+            <tbody>
+              <tr><td><code>comp</code></td><td>Any template name plus <code>params</code>. IS Spec comps take a <code>duration</code>; motion scenes set their own length (<code>end</code> / <code>dur</code> params change it).</td></tr>
+              <tr><td><code>clip</code></td><td><code>src</code>, <code>in</code>, <code>out</code> (source seconds), <code>look</code>: <code>aroll</code> (clean) or <code>behindTitles</code> (blurred, darker, pushed in), <code>overlays</code>.</td></tr>
+              <tr><td><code>overlays</code></td><td><code>{ comp, at, params }</code> over a clip — <code>ov-*</code> or any motion scene with <code>"transparent": true</code>.</td></tr>
+              <tr><td><code>transition</code></td><td>Sits on the cut between its neighbours: <code>tr-flash</code>, <code>tr-torn</code>, <code>tr-ticker</code>, <code>tr-paper-roll</code>, <code>tr-flood</code>, <code>tr-dot</code>, <code>tr-bars</code>, <code>tr-zoom</code>.</td></tr>
+            </tbody>
+          </table></div>
+        </article>
+
+        <article id="d-explainer">
+          <h3>SaaS explainers</h3>
+          <p>Write the beat sheet first: time, what is on screen in exact words, what carries the eye across each change. Then fill the template's params with the product's real wording. Never invent customer counts, ratings or quotes; example UI content is fine.</p>
+          <div class="cols3">
+            <div class="mini"><span class="hud">x-hype</span><b>12–20 s promo</b><p>Spark → brand slam → kinetic triplet → 3D signature → product moment → end card, on 8 bars. Set <code>bpm</code> and <code>offset</code> from <code>beats.py</code>.</p></div>
+            <div class="mini"><span class="hud">x-demo</span><b>30–90 s demo</b><p>Short lines the camera pushes into, then the UI rebuilt up close: <code>prompt</code>, <code>steps</code>, <code>table</code>, <code>chat</code>, <code>chart</code>. 45 s fits 2–3 features.</p></div>
+            <div class="mini"><span class="hud">x-journey</span><b>10–16 s loop</b><p>The workflow as stations a ball rolls through in one take: toggle, slider, notification cards, keyboard, launch, reveal, loop.</p></div>
+          </div>
+<pre class="code" data-lang="bash"><code>node render/cli.mjs sheet x-demo --params-file demo.json --auto 12 --out check.png
+node render/cli.mjs render x-demo --params-file demo.json --blur 1 --out draft.mp4       # send for review
+node render/cli.mjs render x-demo --params-file demo.json --blur 4 --out demo_silent.mp4 # final + demo_silent.cues.json</code></pre>
+          <p class="more"><a href="https://github.com/AkashKhairal/ink-signal/blob/main/docs/EXPLAINERS.md">Beat sheets and every param in EXPLAINERS.md <svg><use href="#i-ext"/></svg></a></p>
+        </article>
+
+        <article id="d-broll">
+          <h3>Motion B-roll for talking heads</h3>
+          <p>Each clip is one shape that never cuts: it morphs between states while a cursor clicks and drags, and every change lands on a spoken word. Cut it in full-frame, or as a transparent panel beside the speaker.</p>
+<pre class="code" data-lang="bash"><code>python3 tools/inspect_video.py talk.mp4 work/     # layout: full / pip / black sections + contact sheet
+python3 tools/words.py talk.srt --out work/words.json
+node render/broll.mjs broll.plan.json --draft     # fast review renders
+node render/broll.mjs broll.plan.json             # final: clips, TIMING.md, preview.mp4, review.html, cues.json</code></pre>
+<pre class="code" data-lang="json"><code>{ "title": "Opus vs Max", "video": "talk.mp4",
+  "clips": [
+    { "id": "01", "scene": "mb-launch", "in": 0.30, "out": 6.75, "kind": "full",
+      "params": { "name": "Opus 5.5", "at": { "badge": 0.63, "card": 2.17, "picker": 4.06, "clicks": [4.5, 4.85, 5.3] } } },
+    { "id": "02", "scene": "mb-terminal", "in": 6.75, "out": 22.5, "kind": "panel", "center": [1300, 540] }
+  ],
+  "notes": ["The typed prompt is illustrative."] }</code></pre>
+          <p><code>at</code> times are clip-local (word time − clip in). <code>center</code> is in the video's pixels. Clips render at the video's resolution and frame rate.</p>
+          <p class="more"><a href="https://github.com/AkashKhairal/ink-signal/blob/main/docs/BROLL.md">The full method in BROLL.md <svg><use href="#i-ext"/></svg></a></p>
+        </article>
+
+        <article id="d-sound">
+          <h3>Sound pass</h3>
+          <p>Renders write a cue list. The pass places one real CC0 sound on each cue, checks the music's beat grid against the kicks, moves the music so hard cuts land on beats, ducks it under voice, and measures the exported MP4.</p>
+<pre class="code" data-lang="bash"><code>node render/cues.mjs plan.json --out cues.json            # edit plans; single renders write &lt;out&gt;.cues.json
+python3 render/sound.py --video reel.mp4 --cues cues.json --music track.mp3 \
+  --music-source "Track, Artist, link" --music-license "…" --align --voice auto --out sound/
+# sound/after.mp4 · SOUND.md · beatgrid.png · checks/ · report.html (swap any sound) · CREDITS.txt</code></pre>
+          <div class="cue-row" id="cues"></div>
+          <p class="aside">Targets: −14 LUFS integrated, true peak below −1.5 dBTP, music −12 dB under effects and −10 dB under voice. Nobody can judge a mix by reading numbers: <code>SOUND.md</code> lists five timestamps to check with headphones.</p>
+          <p class="more"><a href="https://github.com/AkashKhairal/ink-signal/blob/main/docs/SOUND.md">Licences, cue types and the mix in SOUND.md <svg><use href="#i-ext"/></svg></a></p>
+        </article>
+
+        <article id="d-behind">
+          <h3>Title behind you</h3>
+          <p>Cut the person out frame by frame with SAM 2 (or a chroma key for green screen), then put a huge word between the background and them.</p>
+<pre class="code" data-lang="bash"><code>python3 tools/separate.py clip.mp4 --preview work/                    # pick the points on the person
+python3 tools/separate.py clip.mp4 --out work/masks --start 2 --end 6 --points 480,270 --labels 1
+python3 tools/separate.py green.mp4 --out work/masks --chroma 0x00FF00  # green screen: no model needed
+node render/cli.mjs render t-behind --format reel \
+  --params '{"src":"clip.mp4","masks":"work/masks","start":2,"dur":4,"text":"Focus"}' --out focus.mp4</code></pre>
+        </article>
+
+        <article id="d-nle">
+          <h3>Into your editor</h3>
+<pre class="code" data-lang="bash"><code>node render/nle.mjs plan.json --out pkg
+# pkg/renders (ProRes 422 HQ; 4444 + alpha for overlays and transitions) · manifest.json · timeline.xml · edit.spec.json · plates/</code></pre>
+          <div class="table"><table>
+            <thead><tr><th scope="col">App</th><th scope="col">No scripting</th><th scope="col">Scripted or through an MCP server</th></tr></thead>
+            <tbody>
+              <tr><td><b>After Effects</b></td><td>Import <code>pkg/renders/*.mov</code></td><td><code>$.evalFile(".../InkSignal.jsx"); InkSignal.buildFromPackage("/abs/pkg")</code> rebuilds IS Spec comps as native, editable comps — real text and shape layers, keyframes on the exact curves</td></tr>
+              <tr><td><b>Premiere Pro</b></td><td>File › Import › <code>pkg/timeline.xml</code></td><td><code>InkSignalPPro.assemble("/abs/pkg")</code> through the MCP's ExtendScript tool</td></tr>
+              <tr><td><b>DaVinci Resolve</b></td><td>File › Import › Timeline › <code>pkg/timeline.xml</code></td><td><code>assemble("/abs/pkg")</code> through the MCP's Python tool · <code>add_title("Setup")</code> for native Fusion Text+</td></tr>
+            </tbody>
+          </table></div>
+        </article>
+
+        <article id="d-scene">
+          <h3>Write your own scene</h3>
+          <p>A scene builds its DOM once; <code>update(t)</code> sets everything for time <code>t</code>. No timers, no CSS transitions, no <code>Math.random</code> — any frame renders on its own, which is what makes motion blur, parallel renders and seamless loops work.</p>
+<pre class="code" data-lang="js"><code>import { defineScene } from '../scene.js';
+import { morph } from '../morph.js';
+import { segmented } from '../ui.js';
+
+export const mbExample = defineScene({
+  name: 'mb-example', kind: 'broll', title: 'Example', formats: ['yt', 'reel'],
+  defaults: { at: { card: 1.2, click: 2.4 }, end: 4 },
+  duration: (p) => p.end,
+  build(ctx) {
+    const { S, p } = ctx;
+    const m = ctx.add(morph(S, { states: { pill: { w: 420, h: 110, r: 55, bg: 'control', cam: 1.8 },
+                                          card: { w: 900, h: 320, r: 40, bg: 'surface', cam: 1.4 } },
+                                 start: 'pill', seq: [[p.at.card, 'card']] }));
+    ctx.add(segmented(S, m.layer({ tin: p.at.card }), { items: ['Low', 'High'], index: [[p.at.click, 1]] }));
+    ctx.cursor({ keys: [[0, 500, 300], [p.at.click - 0.25, 115, 0], [p.end, 200, 120]], clicks: [p.at.click] });
+    ctx.cue(p.at.card, 'movement', 'morph');
+  },
+});</code></pre>
+          <div class="api" id="api"></div>
+          <p class="more"><a href="https://github.com/AkashKhairal/ink-signal/blob/main/docs/MOTION-ENGINE.md">The engine guide: springs, tracks, rooms, morph, cursor, UI kit <svg><use href="#i-ext"/></svg></a></p>
+        </article>
+
+        <article id="d-ref">
+          <h3>Reference</h3>
+          <div class="table"><table>
+            <thead><tr><th scope="col">Command</th><th scope="col">What it does</th></tr></thead>
+            <tbody>
+              <tr><td><code>node render/cli.mjs list</code></td><td>Every template, its kind and formats</td></tr>
+              <tr><td><code>node render/cli.mjs render · still · sheet · spec</code></td><td>Video, one frame, a contact sheet, or the IS Spec JSON</td></tr>
+              <tr><td><code>node render/build-reel.mjs plan.json</code></td><td>A whole edit plan to a mixed MP4 at −14 LUFS</td></tr>
+              <tr><td><code>node render/broll.mjs broll.plan.json</code></td><td>Motion B-roll clips + timing notes + preview + review page</td></tr>
+              <tr><td><code>node render/cues.mjs plan.json</code></td><td>The sound cue list of a whole edit plan</td></tr>
+              <tr><td><code>python3 render/sound.py</code></td><td>The measured sound pass</td></tr>
+              <tr><td><code>python3 render/beats.py track.mp3</code></td><td>Tempo, beats, downbeats and the drop of a track</td></tr>
+              <tr><td><code>node render/nle.mjs plan.json</code></td><td>After Effects / Premiere Pro / DaVinci Resolve package</td></tr>
+              <tr><td><code>python3 tools/words.py</code> · <code>inspect_video.py</code> · <code>separate.py</code></td><td>Word timings · layout analysis · person cut-out masks</td></tr>
+              <tr><td><code>python3 tools/build.py</code></td><td>Regenerate code and CSS after editing the tokens</td></tr>
+              <tr><td><code>node tools/build_site.mjs --media</code></td><td>Rebuild this website's data and preview videos</td></tr>
+            </tbody>
+          </table></div>
+          <p class="more"><a href="https://github.com/AkashKhairal/ink-signal/blob/main/docs/CATALOG.md">Every template's params in CATALOG.md <svg><use href="#i-ext"/></svg></a><a href="https://github.com/AkashKhairal/ink-signal/blob/main/docs/RECIPES.md">Recipes for 15 / 30 / 60 s Reels and explainers <svg><use href="#i-ext"/></svg></a></p>
+        </article>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ system ═══════════ -->
+<section class="night sec" id="system" aria-labelledby="sys-title">
+  <div class="wrap">
+    <div class="sec-head">
+      <h2 class="display sec-title" id="sys-title"><span class="sel reveal"><span class="t">System</span><i class="h"></i><i class="h"></i><i class="h"></i><i class="h"></i><i class="h"></i><i class="h"></i><i class="h"></i><i class="h"></i><b class="dim mono"></b></span></h2>
+      <p class="sec-lead">Graph-paper daylight, blacked-out night and one signal red. Every value lives in <code>tokens/ink-signal.tokens.json</code>; change the accent once and every template follows.</p>
+    </div>
+
+    <div class="sys">
+      <div class="sys-block">
+        <h3 class="hud">Colour</h3>
+        <div class="swatches" id="swatches"></div>
+        <div class="accent-demo">
+          <div><b>Your brand, one colour.</b><p>Pass <code>"accent"</code> and it replaces signal red in every scene. Try one — this page and the live player follow.</p></div>
+          <div class="accents" id="accents" role="group" aria-label="Accent colour"></div>
+        </div>
+      </div>
+
+      <div class="sys-block">
+        <h3 class="hud">Type</h3>
+        <div class="type-grid">
+          <div class="spec spec-display"><span class="hud">Display · Archivo Expanded Black</span><p class="display">Signal</p><small>Titles. Caps, one or two words, lands inside a selection box.</small></div>
+          <div class="spec"><span class="hud">Label · HUD · Archivo Expanded Bold</span><p class="hudline">Scene 01 / 06 · Portfolio</p><small>Corners, tickers, chips, kickers. Typed on one character per frame.</small></div>
+          <div class="spec"><span class="hud">Interface · Archivo</span><p class="uiline">What should we make?</p><small>Product UI, captions, body copy.</small></div>
+          <div class="spec"><span class="hud">Data · JetBrains Mono</span><p class="mono dataline">00:00:12:08 · 1,250,000</p><small>Timecode, numbers, code, file names.</small></div>
+          <div class="spec"><span class="hud">Note · Caveat</span><p class="noteline">this changed everything</p><small>Human asides in pen blue (white on night), with an arrow to the thing.</small></div>
+        </div>
+      </div>
+
+      <div class="sys-block">
+        <h3 class="hud">Easing</h3>
+        <div class="eases" id="eases"></div>
+      </div>
+
+      <div class="sys-block">
+        <h3 class="hud">Springs</h3>
+        <div class="springs">
+          <svg class="spring-plot" id="spring-plot" viewBox="0 0 640 300" role="img" aria-label="Step response of each spring over 1.2 seconds"></svg>
+          <div class="spring-list" id="springs"></div>
+        </div>
+        <p class="aside">A value that changes target many times is the sum of one closed-form spring per change, so any frame can be computed on its own.</p>
+      </div>
+
+      <div class="sys-block two-layers">
+        <h3 class="hud">Two layers</h3>
+        <div class="layers">
+          <div class="layer-brand">
+            <span class="hud">Brand layer · square</span>
+            <div class="demo-sel"><span class="sel sel-demo in"><span class="t">Setup</span><i class="h"></i><i class="h"></i><i class="h"></i><i class="h"></i><i class="h"></i><i class="h"></i><i class="h"></i><i class="h"></i></span></div>
+            <div class="demo-chip"><b>Step 02</b><span>/ 05</span></div>
+            <div class="demo-glyphs"><svg><use href="#g-star"/></svg><svg><use href="#g-sparkle"/></svg><svg><use href="#g-plus"/></svg></div>
+            <p>Selection boxes, plates, tickers, chips, HUD corners. Square edges, 1.5–3 px outlines.</p>
+          </div>
+          <div class="layer-ui">
+            <span class="hud">Interface layer · rounded</span>
+            <div class="ui-card">
+              <div class="ui-row"><span>Auto-captions</span><button class="ui-toggle" type="button" aria-pressed="true" aria-label="Auto-captions"><i></i></button></div>
+              <div class="ui-seg" role="group" aria-label="Effort"><button type="button">Low</button><button type="button" aria-pressed="true">High</button><button type="button">Max</button><i class="ui-ind"></i></div>
+              <button class="ui-btn" type="button">Make it</button>
+            </div>
+            <p>Product UI rebuilt in the brand: white surfaces, a rule border, soft shadow, Lucide icons, springs. Rounded corners live only here.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="sys-block">
+        <h3 class="hud">Rules</h3>
+        <div class="rules">
+          <div><h4>Do</h4><ul id="rules-do"></ul></div>
+          <div><h4>Don't</h4><ul id="rules-dont"></ul></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ claude (paper) ═══════════ -->
+<section class="paper sec" id="claude" aria-labelledby="cl-title">
+  <div class="wrap">
+    <div class="sec-head">
+      <h2 class="display sec-title" id="cl-title"><span class="sel reveal"><span class="t">With Claude</span><i class="h"></i><i class="h"></i><i class="h"></i><i class="h"></i><i class="h"></i><i class="h"></i><i class="h"></i><i class="h"></i><b class="dim mono"></b></span></h2>
+      <p class="sec-lead">Attach the repo (or a zip of it) to a Claude project and ask in plain words. The root <code>SKILL.md</code> routes the request to one of four skills, and Claude follows the brand rules: one loud colour, real numbers only, and a contact sheet it actually looks at before every render.</p>
+    </div>
+    <div class="skills">
+      <article class="skill">
+        <span class="hud">ink-signal-reels</span>
+        <h3>Reels &amp; YouTube edits</h3>
+        <p class="bubble">Make a Reel from the clips in reel-12, the transcript and this track. Hook in two seconds, cut on the beat.</p>
+        <ol><li>Beat grid and word timings</li><li>Storyboard on the grid</li><li>Edit plan with titles, infographics, transitions</li><li>Review sheet, render, sound, editor package</li></ol>
+      </article>
+      <article class="skill">
+        <span class="hud">ink-signal-explainer</span>
+        <h3>SaaS explainers</h3>
+        <p class="bubble">Make a 15-second launch promo for orbit.app, in our blue, on this track.</p>
+        <ol><li>Reads your site for real wording</li><li>Beat sheet as a table</li><li>Params file, sheet, draft</li><li>Final with blur, sound pass, notes</li></ol>
+      </article>
+      <article class="skill">
+        <span class="hud">ink-signal-broll</span>
+        <h3>Motion B-roll</h3>
+        <p class="bubble">Add motion graphics to my talking-head video, medium density, my brand colour.</p>
+        <ol><li>Layout and words</li><li>A clip plan for your approval</li><li>Stills on the key words</li><li>Clips, preview, review page</li></ol>
+      </article>
+      <article class="skill">
+        <span class="hud">ink-signal-sound</span>
+        <h3>Sound pass</h3>
+        <p class="bubble">Add sound effects and music to this export so it's ready for Instagram.</p>
+        <ol><li>Licence check first</li><li>Cue list, beat grid, alignment</li><li>One real sound per cue</li><li>Measured mix and five timestamps</li></ol>
+      </article>
+    </div>
+  </div>
+</section>
+</main>
+
+<!-- ═══════════ footer (ink) ═══════════ -->
+<footer class="foot night">
+  <div class="ticker ticker-red" aria-hidden="true"><div class="ticker-track rev" data-ticker="Made with code|Rendered frame by frame|One loud colour|Cut on the downbeat|Real numbers only|Transitions are objects"></div></div>
+  <div class="wrap foot-grid">
+    <div class="foot-mark">
+      <span class="sel sel-foot reveal display"><span class="t">Ink &amp; Signal</span><i class="h"></i><i class="h"></i><i class="h"></i><i class="h"></i><i class="h"></i><i class="h"></i><i class="h"></i><i class="h"></i></span>
+      <p>A motion design system you can render. Open source, MIT.</p>
+      <a class="btn btn-signal" href="https://github.com/AkashKhairal/ink-signal"><svg><use href="#i-github"/></svg> View on GitHub</a>
+    </div>
+    <div class="foot-col">
+      <span class="hud">Docs</span>
+      <a href="https://github.com/AkashKhairal/ink-signal/blob/main/docs/CATALOG.md">Catalog</a>
+      <a href="https://github.com/AkashKhairal/ink-signal/blob/main/docs/EXPLAINERS.md">Explainers</a>
+      <a href="https://github.com/AkashKhairal/ink-signal/blob/main/docs/BROLL.md">Motion B-roll</a>
+      <a href="https://github.com/AkashKhairal/ink-signal/blob/main/docs/SOUND.md">Sound pass</a>
+      <a href="https://github.com/AkashKhairal/ink-signal/blob/main/docs/MOTION-ENGINE.md">Motion engine</a>
+      <a href="https://github.com/AkashKhairal/ink-signal/blob/main/docs/MOTION-SPEC.md">Motion spec</a>
+      <a href="https://github.com/AkashKhairal/ink-signal/blob/main/docs/RECIPES.md">Recipes</a>
+    </div>
+    <div class="foot-col">
+      <span class="hud">Library</span>
+      <a href="#explainers">Explainers</a>
+      <a href="#library">All templates</a>
+      <a href="#choose">What to use</a>
+      <a href="docs/library.html">Token &amp; comp viewer</a>
+      <a href="https://github.com/AkashKhairal/ink-signal/tree/main/skills">Claude skills</a>
+      <a href="https://github.com/AkashKhairal/ink-signal/tree/main/integrations">Editor integrations</a>
+    </div>
+    <div class="foot-col foot-credits">
+      <span class="hud">Credits</span>
+      <p>Code MIT. Motion vocabulary, B-roll method and the CC0 sound library build on <a href="https://github.com/Barty-Bart/motion-graphics">Barty-Bart/motion-graphics</a> (MIT). Sounds from Kenney and Freesound (CC0). Icons: Lucide (ISC). Fonts: Archivo, Caveat, JetBrains Mono (OFL). three.js (MIT), GSAP. Visual language inspired by Raagav Sundar's <i>Graphic Design Portfolio 2026</i>; no artwork from it is included. <a href="https://github.com/AkashKhairal/ink-signal/blob/main/THIRD_PARTY_NOTICES.md">Notices</a>.</p>
+    </div>
+  </div>
+  <div class="wrap foot-base">
+    <span class="mono">© 2026 Ink &amp; Signal · v<span id="ver2">3.0.0</span></span>
+    <span class="note note-white">see ya</span>
+  </div>
+</footer>
+
+<!-- ═══════════ live player ═══════════ -->
+<dialog class="pl" id="pl" aria-labelledby="pl-title" tabindex="-1">
+  <div class="pl-head">
+    <span class="hud" id="pl-group">Template</span>
+    <div class="pl-nav">
+      <button class="icon-btn" type="button" id="pl-prev" aria-label="Previous template"><svg><use href="#i-prev"/></svg></button>
+      <button class="icon-btn" type="button" id="pl-next" aria-label="Next template"><svg><use href="#i-next"/></svg></button>
+      <button class="icon-btn" type="button" id="pl-close" aria-label="Close"><svg><use href="#i-close"/></svg></button>
+    </div>
+  </div>
+  <div class="pl-body">
+    <div class="pl-left">
+      <div class="pl-stagewrap">
+        <div class="pl-stage" id="pl-stage" data-fmt="yt">
+          <div class="vf" aria-hidden="true"><i class="tl"></i><i class="tr"></i><i class="bl"></i><i class="br"></i></div>
+        </div>
+      </div>
+      <div class="pl-controls">
+        <button class="icon-btn play" type="button" id="pl-play" aria-label="Pause"><svg><use href="#i-pause"/></svg></button>
+        <input type="range" id="pl-scrub" min="0" max="1000" value="0" step="1" aria-label="Scrub">
+        <span class="mono pl-time" id="pl-time">0.00 / 0.00 s</span>
+        <div class="seg" id="pl-fmt" role="group" aria-label="Format">
+          <button type="button" data-f="reel">Reel</button><button type="button" data-f="yt">YouTube</button><button type="button" data-f="square">Square</button>
+        </div>
+      </div>
+      <p class="pl-mode mono" id="pl-mode"></p>
+    </div>
+    <div class="pl-info">
+      <div class="pl-tags"><code id="pl-name">name</code><span class="tag" id="pl-engine">Motion</span><span class="tag" id="pl-dur">5 s</span></div>
+      <h2 id="pl-title">Title</h2>
+      <p class="pl-desc" id="pl-desc"></p>
+      <p class="pl-best"><span class="hud">Best for</span><span id="pl-best"></span></p>
+      <h3 class="hud">Render it</h3>
+      <div class="codebox"><pre class="code tight" data-lang="bash"><code id="pl-cmd"></code></pre></div>
+      <h3 class="hud">In an edit plan</h3>
+      <div class="codebox"><pre class="code tight" data-lang="json"><code id="pl-plan"></code></pre></div>
+      <details class="pl-params" open>
+        <summary><span class="hud">Params</span><span class="mono" id="pl-pcount"></span></summary>
+        <p class="aside">Edit the JSON and apply: the live player re-renders, and the command above updates.</p>
+        <textarea id="pl-json" spellcheck="false" aria-label="Params JSON"></textarea>
+        <div class="pl-apply"><button class="btn btn-signal btn-sm" type="button" id="pl-apply">Apply</button><button class="btn btn-line-dark btn-sm" type="button" id="pl-reset">Reset</button><span class="err" id="pl-err" role="status"></span></div>
+      </details>
+    </div>
+  </div>
+</dialog>
+
+<script type="module" src="site/site.js"></script>
+</body>
+</html>

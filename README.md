@@ -13,13 +13,17 @@
 <p align="center">
   <img alt="v3" src="https://img.shields.io/badge/version-3.0-F2362B?style=flat-square">
   <img alt="MIT" src="https://img.shields.io/badge/license-MIT-0E0E0E?style=flat-square">
-  <img alt="Scenes" src="https://img.shields.io/badge/templates-65-0E0E0E?style=flat-square">
+  <img alt="Templates" src="https://img.shields.io/badge/templates-64-0E0E0E?style=flat-square">
   <img alt="three.js" src="https://img.shields.io/badge/3D-three.js-F2362B?style=flat-square">
   <img alt="Sound" src="https://img.shields.io/badge/sound-−14%20LUFS%20measured-0E0E0E?style=flat-square">
   <img alt="After Effects" src="https://img.shields.io/badge/After%20Effects-native%20rebuild-0E0E0E?style=flat-square">
   <img alt="Premiere Pro" src="https://img.shields.io/badge/Premiere%20Pro-timeline-0E0E0E?style=flat-square">
   <img alt="DaVinci Resolve" src="https://img.shields.io/badge/DaVinci%20Resolve-timeline-0E0E0E?style=flat-square">
   <img alt="Formats" src="https://img.shields.io/badge/formats-Reels%20·%20YouTube%20·%20Square-ECEBE6?style=flat-square">
+</p>
+
+<p align="center">
+  <a href="https://akashkhairal.github.io/ink-signal/"><b>Website, live player &amp; docs → akashkhairal.github.io/ink-signal</b></a>
 </p>
 
 ---
@@ -382,10 +386,12 @@ skills/        ink-signal-reels · ink-signal-explainer · ink-signal-broll · i
 integrations/  after-effects/ · premiere-pro/ · davinci-resolve/
 docs/          CATALOG · MOTION-SPEC · MOTION-ENGINE · EXPLAINERS · BROLL · SOUND · RECIPES · library.html
 templates/     review.html (B-roll review page)
+index.html     the website (GitHub Pages) · site/ its styles, script, data, fonts and preview videos
 tools/         build.py · catalog.mjs · words.py · inspect_video.py · separate.py · readme_gifs.mjs · ttf_to_typeface.py
 ```
 
-After editing the tokens, run `python3 tools/build.py`; after adding a scene, `node tools/catalog.mjs`.
+After editing the tokens, run `python3 tools/build.py`; after adding a scene, `node tools/catalog.mjs` and
+`node tools/build_site.mjs --media <name>` (website data and its preview video).
 
 ## Credits & licence
 

@@ -50,6 +50,7 @@ export function startServer({ root = LIB_ROOT, port = 0 } = {}) {
 if (process.argv[1] && fileURLToPath(import.meta.url) === path.resolve(process.argv[1])) {
   const port = parseInt(process.env.PORT || '5178', 10);
   startServer({ port }).then(({ port: p }) => {
+    console.log(`Website           → http://127.0.0.1:${p}/`);
     console.log(`Ink & Signal stage → http://127.0.0.1:${p}/stage/index.html?comp=chapter&format=reel&play=1&scale=0.45`);
     console.log(`Library viewer    → http://127.0.0.1:${p}/docs/library.html`);
   });

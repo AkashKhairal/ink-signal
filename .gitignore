@@ -4,3 +4,5 @@ node_modules/
 *.mov
 pkg/
 artifact/
+!site/media/*.mp4
+!site/fixtures/*.mp4

@@ -18,7 +18,9 @@
     "sound": "python3 render/sound.py",
     "nle": "node render/nle.mjs",
     "gifs": "node tools/readme_gifs.mjs",
-    "preview": "node render/serve.mjs"
+    "preview": "node render/serve.mjs",
+    "site": "node tools/build_site.mjs",
+    "site:media": "node tools/build_site.mjs --media"
   },
   "dependencies": {
     "playwright": "^1.47.0"
